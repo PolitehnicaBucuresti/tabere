@@ -481,11 +481,29 @@ h2 {
   background: linear-gradient(180deg, #f6faff, #e8f2ff);
 }
 
+#locatie {
+  display: grid;
+  gap: 2rem;
+}
+
+#locatie h2 {
+  margin-bottom: 0;
+}
+
+#locatie p {
+  margin-top: 0;
+}
+
+#locatie .notice {
+  margin-top: 0;
+}
+
 .locationGallery {
-  margin-top: 1rem;
+  margin-top: 0;
   display: grid;
   grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 0.7rem;
+  row-gap: 1.8rem;
+  column-gap: 2rem;
 }
 
 .imageCard.wide {
