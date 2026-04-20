@@ -137,6 +137,15 @@ export default function Home() {
   return (
     <>
       <header className="hero" id="intro">
+        <Image
+          src={heroImage}
+          alt="Copii la activități în cadrul taberei"
+          fill
+          sizes="100vw"
+          className="heroBackgroundImage"
+          priority
+        />
+        <div className="heroOverlay" aria-hidden="true" />
         <div className="floatingSet heroOrbs" aria-hidden="true">
           <span className="orb orbOne" />
           <span className="orb orbTwo" />
@@ -175,17 +184,6 @@ export default function Home() {
                 Vezi activitățile
               </a>
             </div>
-          </div>
-          <div className="heroVisual">
-            <Image
-              src={heroImage}
-              alt="Copii la activități în cadrul taberei"
-              fill
-              sizes="(max-width: 900px) 100vw, 42vw"
-              className="heroImage"
-              priority
-            />
-            <div className="heroBadge">Campus UPB</div>
           </div>
         </div>
       </header>
