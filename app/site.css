@@ -74,11 +74,7 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   color: var(--ink);
   line-height: 1.62;
-  background:
-    radial-gradient(circle at 8% -8%, #c3daff 0%, transparent 34%),
-    radial-gradient(circle at 92% 10%, #c6ffeb 0%, transparent 28%),
-    radial-gradient(circle at 50% 115%, #f1cbff 0%, transparent 36%),
-    linear-gradient(180deg, #edf4ff 0%, #f8faff 42%, #eef6ff 100%);
+  background: #eef4ff;
 }
 
 h1,
