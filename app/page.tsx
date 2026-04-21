@@ -11,6 +11,7 @@ import {
   Telescope,
   Users,
 } from "lucide-react";
+import MouseAura from "./components/MouseAura";
 
 type ScheduleRow = {
   interval: string;
@@ -58,6 +59,7 @@ export default function Home() {
   return (
     <div className="siteWrap">
       <header className="heroPanel" id="intro">
+        <MouseAura targetId="intro" />
         <nav className="topNav">
           <a className="brand" href="#intro">
             <span className="brandLogoWrap">
