@@ -238,9 +238,9 @@ a {
   margin-bottom: 0.72rem;
   font-size: 0.9rem;
   font-weight: 700;
-  color: #fff9ef;
-  border: 1px solid rgba(255, 238, 200, 0.42);
-  background: linear-gradient(120deg, rgba(134, 87, 255, 0.45), rgba(255, 201, 84, 0.44));
+  color: #eef5ff;
+  border: 1px solid rgba(205, 223, 255, 0.5);
+  background: linear-gradient(120deg, rgba(72, 121, 211, 0.52), rgba(55, 165, 210, 0.38));
 }
 
 .heroCopy h1 {
@@ -391,7 +391,7 @@ a {
 }
 
 .sectionCard {
-  padding: 1.28rem;
+  padding: 3rem;
   border-radius: 20px;
   border: 1px solid var(--line);
   background: var(--surface);
@@ -432,9 +432,9 @@ a {
 }
 
 .chipWarm {
-  background: linear-gradient(120deg, #fff4df, #ffeec5);
-  border-color: #ffd793;
-  color: #8f6715;
+  background: linear-gradient(120deg, #e9f2ff, #dff0ff);
+  border-color: #bdd7ff;
+  color: #2d5db4;
 }
 
 .aboutMosaic {
@@ -493,7 +493,7 @@ a {
 }
 
 .benefitList article {
-  width: 30%;
+  width: 31%;
 }
 
 .aboutSticker {
@@ -507,9 +507,9 @@ a {
   padding: 0.34rem 0.78rem;
   font-size: 0.8rem;
   font-weight: 700;
-  color: #143d87;
-  background: linear-gradient(120deg, #fff4cd, #ffe0b0);
-  border: 1px solid #ffd688;
+  color: #1f4e9f;
+  background: linear-gradient(120deg, #e8f3ff, #d8ebff);
+  border: 1px solid #b8d6ff;
   transform: none;
 }
 
@@ -531,7 +531,7 @@ a {
 .activitiesShowcase {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 0rem;
   border: 0;
   border-radius: 0;
   padding: 0;
