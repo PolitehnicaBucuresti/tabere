@@ -96,7 +96,7 @@ a {
 /* HERO */
 .heroPanel {
   position: relative;
-  width: min(1320px, 98%);
+  width: 90%;
   margin: 1rem auto 1.6rem;
   padding: 1.5rem clamp(1.25rem, 3vw, 2.8rem) 3rem;
   border-radius: 30px;
@@ -141,8 +141,8 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.45rem;
-  height: 2.45rem;
+  width: 4rem;
+  height: 4rem;
   border-radius: 10px;
   background: #ffffff;
 }
@@ -211,7 +211,7 @@ a {
 
 .heroCopy h1 {
   color: #fff;
-  font-size: clamp(2rem, 5.3vw, 3.6rem);
+  font-size: clamp(1rem, 5.3vw, 2.8rem);
   line-height: 1.06;
   margin-bottom: 0.8rem;
   text-shadow: 0 8px 24px rgba(7, 16, 39, 0.48);
@@ -220,6 +220,7 @@ a {
 .heroCopy > p {
   color: #e8efff;
   max-width: 54ch;
+  margin-bottom: 4rem;
 }
 
 .heroCtas {
@@ -232,7 +233,7 @@ a {
 .btnPrimary,
 .btnSoft {
   min-height: 46px;
-  border-radius: 13px;
+  border-radius: 100px;
   padding: 0 1.2rem;
   display: inline-flex;
   align-items: center;
@@ -304,9 +305,11 @@ a {
 
 .heroBadgeCard {
   margin-left: auto;
-  width: fit-content;
-  border-radius: 14px;
-  padding: 0.72rem 0.86rem;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  border-radius: 100px;
+  padding: 0.72rem 1.5rem;
   border: 1px solid #dce7ff;
   background: linear-gradient(145deg, #ffffff 0%, #eef4ff 100%);
 }
@@ -348,7 +351,7 @@ a {
   align-items: center;
   flex-wrap: wrap;
   gap: 0.7rem;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.8rem;
 }
 
 .sectionCard h2 {
@@ -378,13 +381,17 @@ a {
 .aboutMosaic {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
-  gap: 1rem;
+  gap: 3rem;
   position: relative;
   align-items: center;
 }
 
 .aboutText p + p {
-  margin-top: 0.62rem;
+  margin-top: 1rem;
+}
+
+.aboutText h2 {
+  margin-bottom: 1rem;
 }
 
 .leadText {
@@ -400,6 +407,7 @@ a {
   overflow: hidden;
   border: 1px solid #cfe0ff;
   box-shadow: 0 12px 24px rgba(43, 73, 151, 0.14);
+  width: 90%;
 }
 
 .mediaCard::after {
@@ -421,15 +429,18 @@ a {
 
 .benefitList {
   grid-column: 1 / span 2;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.74rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.benefitList article {
+  width: 30%;
 }
 
 .aboutSticker {
   position: absolute;
-  left: 0.1rem;
-  bottom: -0.2rem;
+  left: -1rem;
+  bottom: -1.1rem;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;

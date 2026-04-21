@@ -61,7 +61,7 @@ export default function Home() {
         <nav className="topNav">
           <a className="brand" href="#intro">
             <span className="brandLogoWrap">
-              <Image src="/logo.svg" alt="POLI Summer Camp" width={38} height={38} />
+              <Image src="/logo.svg" alt="POLI Summer Camp" width={60} height={60} />
             </span>
             <span>Poli Summer Camp</span>
           </a>
@@ -123,10 +123,10 @@ export default function Home() {
             <figure className="mediaCard mediaCardGlow">
               <Image src="/despre_noi.jpg" alt="Copii în activități educative la POLI Summer Camp" fill sizes="(max-width: 900px) 100vw, 33vw" />
             </figure>
-            <div className="aboutSticker">
+            {/* <div className="aboutSticker">
               <Sparkles size={16} />
               <span>100% learning by doing</span>
-            </div>
+            </div> */}
             <div className="benefitList">
               <article><h3><ShieldCheck size={18} /> Siguranță</h3><p>Mediu supravegheat, prietenos, dedicat învățării.</p></article>
               <article><h3><Compass size={18} /> Explorare</h3><p>Ateliere practice care dezvoltă creativitatea și logica.</p></article>
