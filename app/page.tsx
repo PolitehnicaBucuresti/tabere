@@ -11,7 +11,6 @@ import {
   Telescope,
   Users,
 } from "lucide-react";
-import MouseAura from "./components/MouseAura";
 
 type ScheduleRow = {
   interval: string;
@@ -59,16 +58,11 @@ export default function Home() {
   return (
     <div className="siteWrap">
       <header className="heroPanel" id="intro">
-        <MouseAura />
-        <div className="heroSparkles" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-          <span />
-        </div>
         <nav className="topNav">
           <a className="brand" href="#intro">
-            <Image src="/logo.svg" alt="POLI Summer Camp" width={38} height={38} />
+            <span className="brandLogoWrap">
+              <Image src="/logo.svg" alt="POLI Summer Camp" width={38} height={38} />
+            </span>
             <span>Poli Summer Camp</span>
           </a>
           <div className="navPills">
@@ -110,23 +104,6 @@ export default function Home() {
           </div>
         </div>
       </header>
-
-      <section className="wowStrip" aria-label="Teme camp">
-        <div className="wowTrack">
-          <span>Aerospațial</span>
-          <span>Robotică</span>
-          <span>Energie Verde</span>
-          <span>Biotehnologie</span>
-          <span>Materiale Inteligente</span>
-          <span>Transporturi</span>
-          <span>Aerospațial</span>
-          <span>Robotică</span>
-          <span>Energie Verde</span>
-          <span>Biotehnologie</span>
-          <span>Materiale Inteligente</span>
-          <span>Transporturi</span>
-        </div>
-      </section>
 
       <main className="contentGrid">
         <section id="despre" className="sectionCard">
@@ -246,11 +223,6 @@ export default function Home() {
             <h2>Înscriere</h2>
             <span className="chip chipWarm">Locuri limitate</span>
           </div>
-          <div className="enrollTopSteps">
-            <article><strong>1</strong><p>Completezi formularul</p></article>
-            <article><strong>2</strong><p>Primești confirmarea</p></article>
-            <article><strong>3</strong><p>Copilul începe aventura</p></article>
-          </div>
           <div className="signupLayout">
             <div className="signupFormPanel">
               <form className="signupForm">
@@ -271,7 +243,7 @@ export default function Home() {
                 <fieldset>
                   <legend>Alegerea programului</legend>
                   {seriesOptions.map((option) => (
-                    <label key={option} className="checkboxLabel">
+                    <label key={option} className="checkboxLabel radioLabel">
                       <input type="radio" name="series" value={option} required />
                       {option}
                     </label>
@@ -339,7 +311,9 @@ export default function Home() {
         <div className="footerInner">
           <div className="footerBrand">
             <a className="brand footerBrandLink" href="#intro">
-              <Image src="/logo.svg" alt="POLI Summer Camp" width={34} height={34} />
+              <span className="brandLogoWrap">
+                <Image src="/logo.svg" alt="POLI Summer Camp" width={34} height={34} />
+              </span>
               <span>Poli Summer Camp</span>
             </a>
             <p>Inspirație. Joacă. Distracție.</p>

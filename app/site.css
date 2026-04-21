@@ -1,16 +1,14 @@
 :root {
-  --bg: #eef4ff;
-  --ink: #0f2350;
-  --ink-soft: #4c6192;
+  --bg: #eef3fb;
+  --ink: #122647;
+  --ink-soft: #536685;
   --surface: #ffffff;
-  --line: #d8e4ff;
-  --blue: #4f63ff;
-  --teal: #17bda9;
-  --violet: #8657ff;
-  --sun: #ffc652;
-  --pink: #ff7fc8;
-  --card-shadow: 0 14px 36px rgba(44, 73, 148, 0.16);
-  --hero-shadow: 0 32px 80px rgba(17, 36, 89, 0.34);
+  --line: #d7e0ef;
+  --blue: #3f5ea8;
+  --teal: #2d9d95;
+  --violet: #5b6ed6;
+  --card-shadow: 0 10px 26px rgba(31, 56, 112, 0.1);
+  --hero-shadow: 0 22px 52px rgba(16, 36, 79, 0.24);
 }
 
 @keyframes fadeUp {
@@ -74,7 +72,7 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   color: var(--ink);
   line-height: 1.62;
-  background: #eef4ff;
+  background: #eef3fb;
 }
 
 h1,
@@ -92,101 +90,28 @@ a {
 }
 
 .siteWrap {
-  padding-bottom: 2.4rem;
+  padding-bottom: 4rem;
 }
 
 /* HERO */
 .heroPanel {
   position: relative;
-  width: min(1280px, 97%);
+  width: min(1320px, 98%);
   margin: 1rem auto 1.6rem;
-  padding: 1.2rem clamp(1rem, 3vw, 2.4rem) 2.6rem;
-  border-radius: 34px;
+  padding: 1.5rem clamp(1.25rem, 3vw, 2.8rem) 3rem;
+  border-radius: 30px;
   overflow: hidden;
   box-shadow: var(--hero-shadow);
-  background: linear-gradient(138deg, #162a5a 0%, #2d3f9a 36%, #1f61b9 70%, #2c79d2 100%);
+  background: linear-gradient(145deg, #1e315f 0%, #2e4d8d 55%, #3464a4 100%);
 }
 
 .heroPanel::before {
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 82% 22%, rgba(255, 201, 84, 0.5), transparent 28%),
-    radial-gradient(circle at 14% 88%, rgba(134, 87, 255, 0.45), transparent 30%),
-    radial-gradient(circle at 46% -4%, rgba(255, 127, 200, 0.28), transparent 26%),
-    linear-gradient(180deg, rgba(10, 18, 42, 0.2) 0%, rgba(10, 18, 42, 0.64) 100%);
+  background: linear-gradient(180deg, rgba(11, 22, 49, 0.18) 0%, rgba(11, 22, 49, 0.58) 100%);
   pointer-events: none;
   z-index: 1;
-}
-
-.mouseAura {
-  position: fixed;
-  width: 320px;
-  height: 320px;
-  border-radius: 999px;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  z-index: 0;
-  mix-blend-mode: screen;
-}
-
-.mouseAuraPrimary {
-  background: radial-gradient(circle, rgba(127, 95, 255, 0.28), rgba(127, 95, 255, 0));
-}
-
-.mouseAuraSecondary {
-  width: 210px;
-  height: 210px;
-  background: radial-gradient(circle, rgba(31, 212, 184, 0.3), rgba(31, 212, 184, 0));
-}
-
-.heroSparkles {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.heroSparkles span {
-  position: absolute;
-  border-radius: 999px;
-  animation: floaty 5s ease-in-out infinite;
-}
-
-.heroSparkles span:nth-child(1) {
-  width: 18px;
-  height: 18px;
-  left: 8%;
-  top: 18%;
-  background: #ffd76a;
-}
-
-.heroSparkles span:nth-child(2) {
-  width: 14px;
-  height: 14px;
-  right: 11%;
-  top: 32%;
-  background: #8ff6e0;
-  animation-delay: 0.7s;
-}
-
-.heroSparkles span:nth-child(3) {
-  width: 26px;
-  height: 26px;
-  right: 33%;
-  bottom: 20%;
-  background: #beadff;
-  animation-delay: 1.3s;
-}
-
-.heroSparkles span:nth-child(4) {
-  width: 12px;
-  height: 12px;
-  left: 42%;
-  top: 10%;
-  background: #ff9ed7;
-  animation-delay: 1s;
 }
 
 .topNav,
@@ -200,16 +125,26 @@ a {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 2.1rem;
+  margin-bottom: 2.6rem;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  color: #f6f9ff;
-  font-size: 1.14rem;
+  color: #f7faff;
+  font-size: 1.22rem;
   font-weight: 800;
+}
+
+.brandLogoWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.45rem;
+  height: 2.45rem;
+  border-radius: 10px;
+  background: #ffffff;
 }
 
 .navPills {
@@ -219,24 +154,42 @@ a {
 }
 
 .navPills a {
+  position: relative;
+  overflow: hidden;
   border-radius: 999px;
-  padding: 0.44rem 0.8rem;
-  font-size: 0.86rem;
-  color: #edf3ff;
-  border: 1px solid rgba(230, 238, 255, 0.35);
-  background: rgba(11, 30, 67, 0.46);
-  transition: transform 0.2s ease, background 0.2s ease;
+  padding: 0.58rem 0.92rem;
+  font-size: 0.9rem;
+  color: #eef4ff;
+  border: 1px solid rgba(230, 238, 255, 0.28);
+  background: rgba(11, 30, 67, 0.34);
+  transition: color 0.24s ease, border-color 0.24s ease;
+}
+
+.navPills a::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06));
+  transform: scale(0.3);
+  opacity: 0;
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
 }
 
 .navPills a:hover {
-  transform: translateY(-2px);
-  background: rgba(14, 35, 80, 0.74);
+  border-color: rgba(238, 244, 255, 0.5);
+  color: #fff;
+}
+
+.navPills a:hover::before {
+  transform: scale(1);
+  opacity: 1;
 }
 
 .heroSplit {
   display: grid;
   grid-template-columns: 1.04fr 0.96fr;
-  gap: 1.4rem;
+  gap: 1.8rem;
   align-items: center;
 }
 
@@ -266,7 +219,7 @@ a {
 
 .heroCopy > p {
   color: #e8efff;
-  max-width: 62ch;
+  max-width: 54ch;
 }
 
 .heroCtas {
@@ -332,7 +285,7 @@ a {
 
 .heroMainImage {
   position: relative;
-  min-height: 410px;
+  min-height: 440px;
   border-radius: 26px;
   overflow: hidden;
   border: 2px solid rgba(226, 236, 255, 0.4);
@@ -367,50 +320,19 @@ a {
   color: #24488f;
 }
 
-/* WOW STRIP */
-.wowStrip {
-  width: min(1280px, 97%);
-  margin: 0 auto 1.6rem;
-  overflow: hidden;
-  border-radius: 999px;
-  border: 1px solid #d3e1ff;
-  background: linear-gradient(120deg, #fff, #f2f7ff);
-  box-shadow: 0 10px 22px rgba(45, 76, 154, 0.12);
-}
-
-.wowTrack {
-  display: flex;
-  width: max-content;
-  gap: 0.95rem;
-  padding: 0.55rem 0.8rem;
-  animation: marquee 20s linear infinite;
-}
-
-.wowTrack span {
-  border-radius: 999px;
-  padding: 0.28rem 0.66rem;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #2f58ac;
-  border: 1px solid #cde0ff;
-  background: #edf4ff;
-}
-
 /* CONTENT */
 .contentGrid {
-  width: min(1160px, 92%);
+  width: min(1120px, 92%);
   margin: 0 auto;
   display: grid;
-  gap: 1.7rem;
+  gap: 1.35rem;
 }
 
 .sectionCard {
-  padding: 1.55rem;
-  border-radius: 28px;
-  border: 1px solid transparent;
-  background:
-    linear-gradient(var(--surface), var(--surface)) padding-box,
-    linear-gradient(120deg, rgba(94, 113, 255, 0.36), rgba(25, 188, 166, 0.26), rgba(255, 201, 84, 0.3)) border-box;
+  padding: 1.28rem;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: var(--surface);
   box-shadow: var(--card-shadow);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -426,7 +348,7 @@ a {
   align-items: center;
   flex-wrap: wrap;
   gap: 0.7rem;
-  margin-bottom: 0.84rem;
+  margin-bottom: 1.2rem;
 }
 
 .sectionCard h2 {
@@ -458,6 +380,7 @@ a {
   grid-template-columns: 1.15fr 0.85fr;
   gap: 1rem;
   position: relative;
+  align-items: center;
 }
 
 .aboutText p + p {
@@ -505,8 +428,8 @@ a {
 
 .aboutSticker {
   position: absolute;
-  right: 0.9rem;
-  top: -0.35rem;
+  left: 0.1rem;
+  bottom: -0.2rem;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -517,7 +440,7 @@ a {
   color: #143d87;
   background: linear-gradient(120deg, #fff4cd, #ffe0b0);
   border: 1px solid #ffd688;
-  transform: rotate(3deg);
+  transform: none;
 }
 
 .benefitList article {
@@ -539,13 +462,10 @@ a {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  border: 1px dashed #d8e5ff;
-  border-radius: 20px;
-  padding: 0.95rem;
-  background:
-    radial-gradient(circle at 0 100%, rgba(124, 87, 255, 0.09), transparent 40%),
-    radial-gradient(circle at 100% 0, rgba(23, 189, 169, 0.1), transparent 38%),
-    #fff;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
 }
 
 .activitiesNarrative > p {
@@ -634,7 +554,7 @@ a {
 .pillRow span {
   border-radius: 999px;
   padding: 0.32rem 0.7rem;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #3059ad;
   border: 1px solid #cfe0ff;
@@ -643,6 +563,7 @@ a {
 
 .muted {
   color: var(--ink-soft);
+  margin-bottom: 0.4rem;
 }
 
 .accordionGrid {
@@ -742,46 +663,15 @@ a {
 
 .dayAccordion li p {
   color: #4b6192;
-  font-size: 0.87rem;
+  font-size: 0.97rem;
+  line-height: 1.45;
 }
 
 .signupLayout {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 1.1rem;
+  grid-template-columns: 1fr;
+  gap: 1rem;
   align-items: start;
-}
-
-.enrollTopSteps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.6rem;
-  margin-bottom: 0.95rem;
-}
-
-.enrollTopSteps article {
-  border-radius: 14px;
-  border: 1px solid #d6e3ff;
-  background: linear-gradient(145deg, #fff, #f2f7ff);
-  padding: 0.7rem;
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.enrollTopSteps strong {
-  width: 1.7rem;
-  height: 1.7rem;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  color: #fff;
-  background: linear-gradient(120deg, #7a59ff, #4a63ff);
-}
-
-.enrollTopSteps p {
-  color: #3d5588;
-  font-weight: 600;
 }
 
 .signupForm {
@@ -791,23 +681,14 @@ a {
 
 .signupFormPanel {
   position: relative;
-  border-radius: 18px;
-  padding: 0.85rem;
-  border: 1px solid transparent;
-  background:
-    linear-gradient(var(--surface), var(--surface)) padding-box,
-    linear-gradient(120deg, rgba(124, 87, 255, 0.45), rgba(79, 99, 255, 0.45), rgba(23, 189, 169, 0.4)) border-box;
+  border-radius: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .signupFormPanel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background:
-    radial-gradient(circle at 100% 0, rgba(124, 87, 255, 0.09), transparent 35%),
-    radial-gradient(circle at 0 100%, rgba(23, 189, 169, 0.09), transparent 35%);
-  pointer-events: none;
+  content: none;
 }
 
 .signupFormPanel .signupForm {
@@ -816,8 +697,8 @@ a {
 }
 
 fieldset {
-  border-radius: 14px;
-  border: 1px solid #d3e1fb;
+  border-radius: 12px;
+  border: 1px solid #d7e0ef;
   background: #fff;
   padding: 0.92rem;
   display: grid;
@@ -872,6 +753,14 @@ textarea:focus {
   accent-color: var(--blue);
 }
 
+.radioLabel {
+  align-items: center;
+}
+
+.radioLabel input[type="radio"] {
+  margin-top: 0;
+}
+
 button[type="submit"] {
   width: fit-content;
   border: 0;
@@ -900,8 +789,7 @@ button[type="submit"]:hover {
 }
 
 .signupInfoPanel {
-  position: sticky;
-  top: 1rem;
+  position: static;
   background:
     radial-gradient(circle at 100% 0, rgba(255, 198, 82, 0.18), transparent 45%),
     radial-gradient(circle at 0 100%, rgba(124, 87, 255, 0.16), transparent 45%),
@@ -938,28 +826,16 @@ button[type="submit"]:hover {
 .locationCollage {
   display: grid;
   grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .collageCreative .mediaCard {
-  transform: rotate(0deg);
-  transition: transform 0.3s ease;
-}
-
-.collageCreative .mediaCard:nth-child(1) {
-  transform: rotate(-1deg);
-}
-
-.collageCreative .mediaCard:nth-child(2) {
-  transform: rotate(1deg);
-}
-
-.collageCreative .mediaCard:nth-child(3) {
-  transform: rotate(-0.8deg);
+  transform: none;
+  transition: transform 0.25s ease;
 }
 
 .collageCreative .mediaCard:hover {
-  transform: rotate(0deg) translateY(-3px);
+  transform: translateY(-2px);
 }
 
 .locationCollage .mediaCard.wide {
@@ -986,7 +862,7 @@ button[type="submit"]:hover {
 /* FOOTER */
 .siteFooter {
   margin-top: 2rem;
-  padding: 2.2rem 1rem 1.2rem;
+  padding: 3.2rem 1rem 2.3rem;
   background: linear-gradient(135deg, #132955 0%, #1b4182 58%, #21529d 100%);
   color: #deebff;
   position: relative;
@@ -1020,7 +896,7 @@ button[type="submit"]:hover {
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1.3fr 1fr 1fr;
-  gap: 1.2rem;
+  gap: 2rem;
   position: relative;
   z-index: 1;
 }
@@ -1064,8 +940,8 @@ button[type="submit"]:hover {
 
 .copyright {
   width: min(1160px, 94%);
-  margin: 1rem auto 0;
-  padding-top: 0.8rem;
+  margin: 1.8rem auto 0;
+  padding-top: 1rem;
   border-top: 1px solid rgba(194, 215, 255, 0.32);
   color: #bfd2f7;
   font-size: 0.88rem;
@@ -1097,10 +973,6 @@ button[type="submit"]:hover {
   .benefitList {
     grid-template-columns: 1fr;
     grid-column: auto;
-  }
-
-  .enrollTopSteps {
-    grid-template-columns: 1fr;
   }
 
   .heroMainImage {
@@ -1158,5 +1030,9 @@ button[type="submit"]:hover {
   .sectionCard {
     padding: 1rem;
     border-radius: 18px;
+  }
+
+  .siteFooter {
+    padding: 2.6rem 1rem 2.2rem;
   }
 }
