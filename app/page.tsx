@@ -172,11 +172,11 @@ export default function Home() {
               <figure className="mediaCard mediaCardGlow activityC">
                 <Image src="/activitate-sportiva.webp" alt="Activitate sportivă în tabără" fill sizes="(max-width: 900px) 100vw, 22vw" />
               </figure>
-              <div className="activitySticker">
+              {/* <div className="activitySticker">
                 <span>+ joacă</span>
                 <span>+ știință</span>
                 <span>+ prietenie</span>
-              </div>
+              </div> */}
             </div>
           </div>
         </section>

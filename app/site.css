@@ -485,8 +485,11 @@ a {
 }
 
 .activitiesPillars {
-  display: grid;
-  gap: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 75%;
+  margin-top: 2rem;
 }
 
 .activitiesPillars article {
@@ -511,10 +514,10 @@ a {
 }
 
 .activitiesMosaic {
+  padding: 0 1rem;
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: 1.1fr 0.9sfr;
   grid-template-rows: 1fr 1fr;
-  gap: 0.7rem;
   position: relative;
 }
 
@@ -538,8 +541,8 @@ a {
 
 .activitySticker {
   position: absolute;
-  left: 8px;
-  bottom: 8px;
+  left: 18rem;
+  bottom: -0.2rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.36rem;
