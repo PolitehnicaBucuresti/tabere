@@ -290,10 +290,11 @@ export default function Home() {
             <h2>Locație</h2>
             <span className="chip"><MapPin size={15} /> Campus UPB</span>
           </div>
-          <p>
+          <p className="locationDescription" style={{ fontSize: '14px' }}>
             Taberele se desfășoară în campusul modern al Universității Naționale de Știință
             și Tehnologie POLITEHNICA București, un spațiu sigur, verde și dedicat învățării.
           </p>
+     
           <div className="locationCollage collageCreative">
             <figure className="mediaCard wide mediaCardGlow"><Image src="/campus-poli.jpg" alt="Campus POLITEHNICA București" fill sizes="(max-width: 900px) 100vw, 38vw" /></figure>
             <figure className="mediaCard mediaCardGlow"><Image src="/ss-campus.png" alt="Campus POLITEHNICA București" fill sizes="(max-width: 900px) 100vw, 30vw" /></figure>
@@ -312,7 +313,7 @@ export default function Home() {
           <div className="footerBrand">
             <a className="brand footerBrandLink" href="#intro">
               <span className="brandLogoWrap">
-                <Image src="/logo.svg" alt="POLI Summer Camp" width={34} height={34} />
+                <Image src="/logo.svg" alt="POLI Summer Camp" width={60} height={60} />
               </span>
               <span>Poli Summer Camp</span>
             </a>

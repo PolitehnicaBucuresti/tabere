@@ -89,9 +89,7 @@ a {
   text-decoration: none;
 }
 
-.siteWrap {
-  padding-bottom: 4rem;
-}
+
 
 /* HERO */
 .heroPanel {
@@ -759,7 +757,7 @@ textarea:focus {
 .checkboxLabel {
   display: flex;
   gap: 0.54rem;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .checkboxLabel input {
@@ -778,21 +776,21 @@ textarea:focus {
 button[type="submit"] {
   width: fit-content;
   border: 0;
-  border-radius: 12px;
+  border-radius: 999px;
   padding: 0.8rem 1.2rem;
   color: #fff;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(120deg, var(--teal), #0ea193);
-  box-shadow: 0 10px 18px rgba(14, 161, 147, 0.2);
+  background: linear-gradient(120deg, #263f77, #35599d);
+  box-shadow: 0 10px 18px rgba(25, 48, 102, 0.24);
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 button[type="submit"]:hover {
   transform: translateY(-2px);
-  filter: brightness(1.03);
-  box-shadow: 0 14px 24px rgba(14, 161, 147, 0.28);
+  filter: brightness(1.05);
+  box-shadow: 0 14px 24px rgba(20, 41, 90, 0.32);
 }
 
 .signupInfo {
@@ -804,10 +802,7 @@ button[type="submit"]:hover {
 
 .signupInfoPanel {
   position: static;
-  background:
-    radial-gradient(circle at 100% 0, rgba(255, 198, 82, 0.18), transparent 45%),
-    radial-gradient(circle at 0 100%, rgba(124, 87, 255, 0.16), transparent 45%),
-    linear-gradient(180deg, #ffffff 0%, #f3f8ff 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f6f8fd 100%);
 }
 
 .signupInfo h3 {
@@ -829,18 +824,25 @@ button[type="submit"]:hover {
   display: flex;
   align-items: center;
   gap: 0.42rem;
-  border-radius: 12px;
+  border-radius: 999px;
   padding: 0.6rem 0.7rem;
-  color: #2a539f;
-  border: 1px solid #cfe0ff;
-  background: linear-gradient(120deg, #eaf2ff, #e5fcf4);
-  animation: pulseGlow 2.2s ease-in-out infinite;
+  color: #284886;
+  border: 1px solid #d6e0f0;
+  background: #eff3fa;
 }
 
 .locationCollage {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 0.8rem;
+  display: flex;
+  width: 100%;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+
+.locationCollage > * {
+  flex: 1 1 0;
+  min-width: 0;
+  border-radius: 0;
+  margin: 0;
 }
 
 .collageCreative .mediaCard {
@@ -856,11 +858,27 @@ button[type="submit"]:hover {
   min-height: 220px;
 }
 
+.locationCollage .mediaCard,
+.locationCollage .mediaCard.wide {
+  flex: 1 1 0;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.locationCollage .mediaCard::after {
+  content: none;
+}
+
 .locationFacts {
   margin-top: 0.95rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.52rem;
+}
+
+.locationDescription {
+ font-size:10px;
 }
 
 .locationFacts span {
@@ -875,12 +893,16 @@ button[type="submit"]:hover {
 
 /* FOOTER */
 .siteFooter {
-  margin-top: 2rem;
-  padding: 3.2rem 1rem 2.3rem;
+  padding: 6rem 1rem;
   background: linear-gradient(135deg, #132955 0%, #1b4182 58%, #21529d 100%);
   color: #deebff;
   position: relative;
+  left: 0;
+  width: 100%;
   overflow: hidden;
+  z-index: 10;
+  margin-top: 2rem;
+  bottom: 0;
 }
 
 .siteFooter::before {
@@ -979,9 +1001,12 @@ button[type="submit"]:hover {
   .aboutMosaic,
   .activitiesShowcase,
   .signupLayout,
-  .locationCollage,
   .footerInner {
     grid-template-columns: 1fr;
+  }
+
+  .locationCollage {
+    flex-direction: column;
   }
 
   .benefitList {
