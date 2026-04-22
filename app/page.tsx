@@ -1,4 +1,7 @@
+ "use client";
+
 import Image from "next/image";
+import { useState } from "react";
 import {
   CalendarDays,
   Clock3,
@@ -23,6 +26,7 @@ type ScheduleRow = {
 };
 
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const currentYear = new Date().getFullYear();
 
   const schedule: ScheduleRow[] = [
@@ -61,19 +65,33 @@ export default function Home() {
       <header className="heroPanel" id="intro">
         <MouseAura targetId="intro" />
         <nav className="topNav">
-          <a className="brand" href="#intro">
-            <span className="brandLogoWrap">
-              <Image src="/logo.svg" alt="POLI Summer Camp" width={60} height={60} />
-            </span>
-            <span>Poli Summer Camp</span>
-          </a>
-          <div className="navPills">
-            <a href="#despre">Despre</a>
-            <a href="#activitati">Activități</a>
-            <a href="#program">Program</a>
-            <a href="#inscriere">Înscriere</a>
-            <a href="#locatie">Locație</a>
-            <a href="#contact">Contact</a>
+          <div className="topNavRow">
+            <a className="brand" href="#intro" onClick={() => setMenuOpen(false)}>
+              <span className="brandLogoWrap">
+                <Image src="/Logo_RO_PB(ALB)2.svg" alt="POLI Summer Camp" width={60} height={60} />
+              </span>
+              <span>Poli Summer Camp</span>
+            </a>
+            <button
+              type="button"
+              className={`navToggle ${menuOpen ? "isOpen" : ""}`}
+              aria-label="Toggle navigation menu"
+              aria-expanded={menuOpen}
+              aria-controls="site-nav-links"
+              onClick={() => setMenuOpen((prev) => !prev)}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
+          <div id="site-nav-links" className={`navPills ${menuOpen ? "isOpen" : ""}`}>
+            <a href="#despre" onClick={() => setMenuOpen(false)}>Despre</a>
+            <a href="#activitati" onClick={() => setMenuOpen(false)}>Activități</a>
+            <a href="#program" onClick={() => setMenuOpen(false)}>Program</a>
+            <a href="#inscriere" onClick={() => setMenuOpen(false)}>Înscriere</a>
+            <a href="#locatie" onClick={() => setMenuOpen(false)}>Locație</a>
+            <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
           </div>
         </nav>
 
@@ -315,7 +333,7 @@ export default function Home() {
           <div className="footerBrand">
             <a className="brand footerBrandLink" href="#intro">
               <span className="brandLogoWrap">
-                <Image src="/logo.svg" alt="POLI Summer Camp" width={60} height={60} />
+                <Image src="/Logo_RO_PB(ALB)2.svg" alt="POLI Summer Camp" width={60} height={60} />
               </span>
               <span>Poli Summer Camp</span>
             </a>
