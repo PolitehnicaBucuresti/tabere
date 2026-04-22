@@ -1279,14 +1279,22 @@ button[type="submit"]:hover {
   }
 
   .sectionCard {
-    padding: 1rem;
+    padding: 1.35rem 1.25rem;
     border-radius: 18px;
     max-width: 100%;
     overflow: hidden;
   }
 
+  .sectionCard h2 {
+    font-size: clamp(1.62rem, 7.2vw, 2rem);
+  }
+
+  .sectionHeaderRow {
+    margin-bottom: 2.2rem;
+  }
+
   .aboutMosaic {
-    gap: 1rem;
+    gap: 1.45rem;
   }
 
   .mediaCard {
@@ -1296,7 +1304,21 @@ button[type="submit"]:hover {
   }
 
   .activitiesShowcase {
-    gap: 0.9rem;
+    gap: 1.45rem;
+  }
+
+  .activitiesNarrative > p {
+    margin-bottom: 1.25rem;
+  }
+
+  .activitiesPillars {
+    height: auto;
+    margin-top: 0;
+    gap: 1rem;
+  }
+
+  .activitiesPillars article {
+    padding: 0.92rem;
   }
 
   .activitiesMosaic {
@@ -1342,7 +1364,7 @@ button[type="submit"]:hover {
   }
 
   .locationCollage {
-    gap: 1rem;
+    gap: 1.45rem;
   }
 
   .locationCollage .mediaCard,
