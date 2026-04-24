@@ -115,7 +115,7 @@ export default function Home() {
 
           <div className="heroVisualStack">
             <figure className="heroMainImage">
-              <Image src="/hero-main.jpg" alt="Copii la activități în cadrul taberei" fill priority sizes="(max-width: 900px) 100vw, 46vw" />
+              <Image src="/8.close-up-smiley-kids-team.jpg" alt="Copii la activități în cadrul taberei" fill priority sizes="(max-width: 900px) 100vw, 46vw" />
             </figure>
             <div className="heroBadgeCard">
               <p>Program pilot</p>
@@ -141,7 +141,7 @@ export default function Home() {
               </p>
             </article>
             <figure className="mediaCard mediaCardGlow">
-              <Image src="/despre_noi.jpg" alt="Copii în activități educative la POLI Summer Camp" fill sizes="(max-width: 900px) 100vw, 33vw" />
+              <Image src="/3.kids-using-electronic-parts-build-robot.jpg" alt="Copii în activități educative la POLI Summer Camp" fill sizes="(max-width: 900px) 100vw, 33vw" style={{ objectPosition: "center 15%" }} />
             </figure>
             {/* <div className="aboutSticker">
               <Sparkles size={16} />
@@ -184,13 +184,13 @@ export default function Home() {
 
             <div className="activitiesMosaic">
               <figure className="mediaCard mediaCardGlow activityA">
-                <Image src="/atelier-copii-1.png" alt="Copii participând la atelier practic" fill sizes="(max-width: 900px) 100vw, 34vw" />
+                <Image src="/1.children-using-building-kit.jpg" alt="Copii participând la atelier practic" fill sizes="(max-width: 900px) 100vw, 34vw" />
               </figure>
               <figure className="mediaCard mediaCardGlow activityB">
-                <Image src="/atelier-copii-2.jpg" alt="Atelier educativ pentru copii" fill sizes="(max-width: 900px) 100vw, 26vw" />
+                <Image src="/5.schoolchildren-working-with-experiment.jpg" alt="Atelier educativ pentru copii" fill sizes="(max-width: 900px) 100vw, 26vw" />
               </figure>
               <figure className="mediaCard mediaCardGlow activityC">
-                <Image src="/activitate-sportiva.webp" alt="Activitate sportivă în tabără" fill sizes="(max-width: 900px) 100vw, 22vw" />
+                <Image src="/6.kids-interacting-with-plasma-ball.jpg" alt="Copii explorând experimente științifice în tabără" fill sizes="(max-width: 900px) 100vw, 22vw" />
               </figure>
               {/* <div className="activitySticker">
                 <span>+ joacă</span>
