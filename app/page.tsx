@@ -32,11 +32,10 @@ export default function Home() {
   const schedule: ScheduleRow[] = [
     { interval: "08:30 - 09:30", day1: "Sosire copii", day2: "Sosire copii", day3: "Sosire copii", day4: "Sosire copii", day5: "Sosire copii" },
     { interval: "09:30 - 10:00", day1: "Warm-up și transfer", day2: "Warm-up și transfer", day3: "Warm-up și transfer", day4: "Warm-up și transfer", day5: "Warm-up și transfer" },
-    { interval: "10:00 - 10:45", day1: "Marea aventură a materialelor (Știința și Ingineria Materialelor)", day2: "Laboratorul viitorului (FIcBi)", day3: "Micii cercetători. Ce se ascunde în mâncarea noastră? (ISB)", day4: "Magia electricității (IE)", day5: "Cum se mișcă lucrurile (FIMM)" },
-    { interval: "10:45 - 11:15", day1: "Smashing hammer - activitate practică", day2: "Activitate practică: Sunt un mic cercetător", day3: "Detectivii naturii (ISB)", day4: "Primul meu circuit (IE)", day5: "Mini sisteme automate (FIMM)" },
-    { interval: "11:15 - 12:15", day1: "Punem lumea în mișcare - simulare circuit și (Transporturi)", day2: "Atelier construit avioane (FIA)", day3: "Academia Micilor Brutari (ISB)", day4: "Energie verde - atelier (Energetică)", day5: "Atelier robotică (FIIR)" },
-    { interval: "12:15 - 12:45", day1: "Atelier activitate practică - Orașul inteligent (Transporturi)", day2: "Activitate practică - Lansare (FIA)", day3: "Unde a dispărut ecoul - activitate practică în camera anecoică (ISB)", day4: "Puterea fulgerelor (Energetică)", day5: "Demonstrații printare 3D (FIIR)" },
-    { interval: "12:45 - 13:00", day1: "Transfer - plimbare prin campus", day2: "Transfer", day3: "Transfer - plimbare prin campus", day4: "Transfer - plimbare prin campus", day5: "Transfer - plimbare prin campus" },
+    { interval: "10:00 - 11:00", day1: "Marea aventură a materialelor (Știința și Ingineria Materialelor)", day2: "Laboratorul viitorului (FIcBi)", day3: "Micii cercetători. Ce se ascunde în mâncarea noastră? Academia Micilor Brutari (ISB)", day4: "Magia electricității (IE)", day5: "Cum se mișcă lucrurile. Mecanisme inteligente (FIMM)" },
+    { interval: "11:00 - 11:20", day1: "Q&A + gustare (fruct)", day2: "Q&A + gustare (fruct)", day3: "Q&A + gustare (fruct)", day4: "Q&A + gustare (fruct)", day5: "Q&A + gustare (fruct)" },
+    { interval: "11:20 - 12:40", day1: "Punem lumea în mișcare - simulare circuit. Atelier activitate practică - Orașul inteligent (Transporturi)", day2: "Atelier construit avioane. Activitate practică - Lansare (FIA)", day3: "Unde a dispărut ecoul. Activitate practică în camera anecoică (ISB)", day4: "Puterea fulgerelor (Energetică)", day5: "Atelier robotică (FIIR)" },
+    { interval: "12:40 - 13:00", day1: "Transfer - plimbare prin campus", day2: "Transfer", day3: "Transfer - plimbare prin campus", day4: "Transfer - plimbare prin campus", day5: "Transfer - plimbare prin campus" },
     { interval: "13:00 - 14:00", day1: "Prânz", day2: "Prânz", day3: "Prânz", day4: "Prânz", day5: "Prânz" },
     { interval: "14:00 - 15:30", day1: "Atelier creativ - pictură", day2: "Atelier de improvizație teatrală", day3: "Atelier arheologie - Vânătorii de comori", day4: "Workshop Euronews - Micii reporteri", day5: "Workshop dezbateri - Avocat pentru o zi (Facultatea de Drept)" },
     { interval: "15:30 - 16:15", day1: "Știința București - joc și mișcare", day2: "Știința București - joc și mișcare", day3: "Știința București - joc și mișcare", day4: "Știința București - joc și mișcare", day5: "Știința București - joc și mișcare" },
@@ -46,10 +45,10 @@ export default function Home() {
   ];
 
   const seriesOptions = [
-    "Seria 1 - interval 08:30 - 09:30",
-    "Seria 2 - interval 09:30 - 10:00",
-    "Seria 3 - interval 10:00 - 10:45",
-    "Seria 4 - interval 10:45 - 11:15",
+    "Săptămâna 1 - 22-26 iunie",
+    "Săptămâna 2 - 29 iunie - 3 iulie",
+    "Săptămâna 3 - 6-10 iulie",
+    "Săptămâna 4 - 13-17 iulie",
   ];
 
   const dayPrograms = [
@@ -109,7 +108,7 @@ export default function Home() {
             </div>
             <div className="heroMeta">
               <span><Clock3 size={16} /> 08:30 - 18:00</span>
-              <span><Users size={16} /> Grupe mici, atenție individuală</span>
+              <span><Users size={16} /> pentru elevi de scoala primară</span>
             </div>
           </div>
 
@@ -274,7 +273,7 @@ export default function Home() {
                   <legend>Informații importante</legend>
                   <label>
                     Alergii sau afecțiuni medicale (dacă este cazul)
-                    <textarea name="medicalInfo" rows={4} />
+                    <textarea name="medicalInfo" rows={4} required />
                   </label>
                 </fieldset>
 
