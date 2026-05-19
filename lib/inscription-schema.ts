@@ -36,6 +36,22 @@ export const inscriptionPayloadSchema = z.object({
         "Completați informațiile despre alergii sau afecțiuni (sau scrieți „Nu există” dacă nu este cazul).",
     })
     .max(4000),
+  childPassions: z
+    .string()
+    .trim()
+    .min(1, {
+      message:
+        "Descrieți pasiunile copilului sau scrieți „Nu există” dacă nu este cazul.",
+    })
+    .max(4000),
+  organizerNotes: z
+    .string()
+    .trim()
+    .min(1, {
+      message:
+        "Completați mesajul pentru organizatori sau scrieți „Nu am informații suplimentare.” dacă nu este cazul.",
+    })
+    .max(4000),
   gdpr: z.literal(true, { message: "Este necesar consimțământul pentru prelucrarea datelor personale." }),
   ageCategory: z.enum(INSCRIPTION_AGE_CATEGORIES, { message: "Selectați categoria de vârstă (tab)." }),
 });

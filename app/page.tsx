@@ -32,6 +32,8 @@ const INSCRIPTION_FIELD_SCROLL_ORDER: InscriptionFieldKey[] = [
   "ageCategory",
   "series",
   "medicalInfo",
+  "childPassions",
+  "organizerNotes",
   "gdpr",
 ];
 
@@ -159,6 +161,8 @@ export default function Home() {
       school: String(fd.get("school") ?? "").trim(),
       series,
       medicalInfo: String(fd.get("medicalInfo") ?? "").trim(),
+      childPassions: String(fd.get("childPassions") ?? "").trim(),
+      organizerNotes: String(fd.get("organizerNotes") ?? "").trim(),
       gdpr: gdprAccepted,
       ageCategory:
         (String(fd.get("ageCategory") ?? "").trim() || selectedAgeCategory) as InscriptionPayload["ageCategory"],
@@ -392,8 +396,20 @@ export default function Home() {
           </div>
           <p className="muted">
             Programul combină activități educaționale cu joacă și relaxare, într-un ritm echilibrat.
-            Tarifele vor fi actualizate după comunicarea finală a organizatorilor.
           </p>
+          <article className="tariffsCard" aria-labelledby="tarife-heading">
+            <h3 id="tarife-heading">Tarife</h3>
+            <p className="tariffsPrice">
+              <strong>1 100 RON</strong> / copil / săptămână
+            </p>
+            <p>
+              Tariful include: <strong>hrană</strong>, <strong>apă</strong>,{" "}
+              <strong>materiale/rechizite</strong>, <strong>asistență medicală</strong>.
+            </p>
+            <p className="tariffsDiscount">
+              <strong>Discount frați: 20%</strong>
+            </p>
+          </article>
           <div className="accordionGrid">
             {dayPrograms.map((day, index) => {
               const Icon = day.icon;
@@ -610,6 +626,32 @@ export default function Home() {
                       className={fieldErrors.medicalInfo ? "inputInvalid" : undefined}
                     />
                     <FieldError message={fieldErrors.medicalInfo} />
+                  </label>
+                  <label className="signupFieldLabel">
+                    <span className="signupFieldLabelText">
+                      Care sunt pasiunile copilului tău?
+                    </span>
+                    <textarea
+                      name="childPassions"
+                      rows={4}
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.childPassions}
+                      className={fieldErrors.childPassions ? "inputInvalid" : undefined}
+                    />
+                    <FieldError message={fieldErrors.childPassions} />
+                  </label>
+                  <label className="signupFieldLabel">
+                    <span className="signupFieldLabelText">
+                      Ce alte informații mai dorești să comunici organizatorilor?
+                    </span>
+                    <textarea
+                      name="organizerNotes"
+                      rows={4}
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.organizerNotes}
+                      className={fieldErrors.organizerNotes ? "inputInvalid" : undefined}
+                    />
+                    <FieldError message={fieldErrors.organizerNotes} />
                   </label>
                 </fieldset>
 

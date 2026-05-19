@@ -693,6 +693,50 @@ a {
   margin-bottom: 0.4rem;
 }
 
+.tariffsCard {
+  margin: 1rem 0 1.15rem;
+  padding: 1.25rem clamp(1rem, 3vw, 1.5rem);
+  border-radius: 16px;
+  border: 1px solid #cfe0ff;
+  background: linear-gradient(145deg, #f8faff 0%, #edf4ff 100%);
+  box-shadow: 0 8px 22px rgba(31, 56, 112, 0.06);
+}
+
+.tariffsCard h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1e315f;
+  margin-bottom: 0.65rem;
+}
+
+.tariffsCard p {
+  margin: 0 0 0.55rem;
+  font-size: 0.98rem;
+  color: var(--ink-soft);
+}
+
+.tariffsCard p:last-child {
+  margin-bottom: 0;
+}
+
+.tariffsPrice {
+  font-size: 1.18rem;
+  color: var(--ink);
+}
+
+.tariffsPrice strong {
+  color: #1e315f;
+  font-weight: 800;
+}
+
+.tariffsDiscount {
+  margin-top: 0.35rem !important;
+  padding-top: 0.55rem;
+  border-top: 1px dashed #d0dff5;
+  font-weight: 600;
+  color: #274b96 !important;
+}
+
 .accordionGrid {
   margin-top: 0.92rem;
   display: grid;

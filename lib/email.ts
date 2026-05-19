@@ -11,6 +11,19 @@ function sanitizeSubjectPart(value: string, max = 100): string {
   return value.replace(/[\r\n]/g, " ").trim().slice(0, max);
 }
 
+/** Escape user-provided text embedded in HTML e-mail bodies */
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function htmlMultiline(text: string): string {
+  return escapeHtml(text).replace(/\n/g, "<br>");
+}
+
 /** Trim, drop empties, dedupe addresses case-insensitively (for To/Cc). */
 function uniqueRecipientList(...emails: string[]): string[] {
   const seen = new Set<string>();
@@ -194,20 +207,20 @@ function getAdminEmailHtml(data: InscriptionPayload): string {
           <div class="section-title">Informații Program</div>
           <table>
             <tr>
-              <th>Categorie Vârstă</th>
-              <td><span class="badge">${data.ageCategory}</span></td>
+              <th>Categorie vârstă</th>
+              <td><span class="badge">${escapeHtml(data.ageCategory)}</span></td>
             </tr>
             <tr>
               <th>Seria aleasă</th>
-              <td><strong>${data.series}</strong></td>
+              <td><strong>${escapeHtml(data.series)}</strong></td>
             </tr>
           </table>
 
-          <div class="section-title">Date Copil</div>
+          <div class="section-title">Date copil</div>
           <table>
             <tr>
-              <th>Nume Copil</th>
-              <td>${data.childName}</td>
+              <th>Nume copil</th>
+              <td>${escapeHtml(data.childName)}</td>
             </tr>
             <tr>
               <th>Vârstă</th>
@@ -215,32 +228,42 @@ function getAdminEmailHtml(data: InscriptionPayload): string {
             </tr>
             <tr>
               <th>Școală</th>
-              <td>${data.school}</td>
+              <td>${escapeHtml(data.school)}</td>
             </tr>
           </table>
 
-          <div class="section-title">Date Părinte</div>
+          <div class="section-title">Date părinte</div>
           <table>
             <tr>
-              <th>Nume Părinte</th>
-              <td>${data.parentName}</td>
+              <th>Nume părinte</th>
+              <td>${escapeHtml(data.parentName)}</td>
             </tr>
             <tr>
               <th>Telefon</th>
-              <td><a href="tel:${data.phone}" style="color: #3f5ea8; text-decoration: none;">${data.phone}</a></td>
+              <td><a href="tel:${escapeHtml(data.phone)}" style="color: #3f5ea8; text-decoration: none;">${escapeHtml(data.phone)}</a></td>
             </tr>
             <tr>
               <th>E-mail</th>
-              <td><a href="mailto:${data.email}" style="color: #3f5ea8; text-decoration: none;">${data.email}</a></td>
+              <td><a href="mailto:${escapeHtml(data.email)}" style="color: #3f5ea8; text-decoration: none;">${escapeHtml(data.email)}</a></td>
             </tr>
           </table>
 
-          <div class="section-title">Informații Medicale / Alergii</div>
+          <div class="section-title">Informații medicale / alergii</div>
           ${
             data.medicalInfo && data.medicalInfo.toLowerCase() !== "nu" && data.medicalInfo.trim() !== "-"
-              ? `<div class="medical-box">${data.medicalInfo.replace(/\n/g, "<br>")}</div>`
+              ? `<div class="medical-box">${htmlMultiline(data.medicalInfo)}</div>`
               : `<div class="medical-box-none">Nu sunt raportate probleme medicale, alergii sau afecțiuni.</div>`
           }
+
+          <div class="section-title">Pasiuni ale copilului</div>
+          <div class="medical-box" style="border-left-color: #3f5ea8;">
+            ${htmlMultiline(data.childPassions)}
+          </div>
+
+          <div class="section-title">Mesaj către organizatori</div>
+          <div class="medical-box" style="border-left-color: #5b6ed6;">
+            ${htmlMultiline(data.organizerNotes)}
+          </div>
 
           <div class="section-title">Acorduri</div>
           <table>
@@ -358,6 +381,24 @@ function getParentConfirmationHtml(data: InscriptionPayload): string {
           font-weight: 700;
           text-align: right;
         }
+        .parent-note-block {
+          padding: 10px 0;
+          border-bottom: 1px dashed #eef3fb;
+        }
+        .parent-note-block-last {
+          border-bottom: none;
+        }
+        .parent-note-label {
+          font-weight: 700;
+          color: #536685;
+          font-size: 13px;
+          margin-bottom: 6px;
+        }
+        .parent-note-body {
+          font-size: 14px;
+          color: #122647;
+          line-height: 1.55;
+        }
         .steps {
           margin-top: 25px;
           margin-bottom: 25px;
@@ -431,18 +472,18 @@ function getParentConfirmationHtml(data: InscriptionPayload): string {
           <p>Cerere de înscriere înregistrată cu succes</p>
         </div>
         <div class="content">
-          <div class="greeting">Dragă ${data.parentName},</div>
+          <div class="greeting">Dragă ${escapeHtml(data.parentName)},</div>
           <div class="intro-text">
             Vă mulțumim pentru interesul acordat taberei de vară <strong>Poli Summer Camp</strong>! 
-            Am primit cu succes cererea dvs. de înscriere pentru copilul <strong>${data.childName}</strong>. 
+            Am primit cu succes cererea dvs. de înscriere pentru copilul <strong>${escapeHtml(data.childName)}</strong>. 
             Mai jos găsiți rezumatul detaliilor transmise:
           </div>
 
           <div class="details-card">
-            <div class="details-title">Rezumat Înscriere</div>
+            <div class="details-title">Rezumat înscriere</div>
             <div class="details-row">
               <span class="details-label">Nume copil:</span>
-              <span class="details-value">${data.childName}</span>
+              <span class="details-value">${escapeHtml(data.childName)}</span>
             </div>
             <div class="details-row">
               <span class="details-label">Vârstă copil:</span>
@@ -450,15 +491,47 @@ function getParentConfirmationHtml(data: InscriptionPayload): string {
             </div>
             <div class="details-row">
               <span class="details-label">Categorie de vârstă:</span>
-              <span class="details-value">${data.ageCategory}</span>
+              <span class="details-value">${escapeHtml(data.ageCategory)}</span>
             </div>
             <div class="details-row">
-              <span class="details-label">Seria aleasă:</span>
-              <span class="details-value">${data.series}</span>
+              <span class="details-label">Săptămâna aleasă:</span>
+              <span class="details-value">${escapeHtml(data.series)}</span>
             </div>
             <div class="details-row">
               <span class="details-label">Școala copilului:</span>
-              <span class="details-value">${data.school}</span>
+              <span class="details-value">${escapeHtml(data.school)}</span>
+            </div>
+          </div>
+
+          <div class="details-card">
+            <div class="details-title">Informații medicale și mesaje</div>
+            <div class="parent-note-block">
+              <div class="parent-note-label">Alergii sau afecțiuni medicale</div>
+              <div class="parent-note-body">${htmlMultiline(data.medicalInfo)}</div>
+            </div>
+            <div class="parent-note-block">
+              <div class="parent-note-label">Pasiunile copilului</div>
+              <div class="parent-note-body">${htmlMultiline(data.childPassions)}</div>
+            </div>
+            <div class="parent-note-block parent-note-block-last">
+              <div class="parent-note-label">Mesaj către organizatori</div>
+              <div class="parent-note-body">${htmlMultiline(data.organizerNotes)}</div>
+            </div>
+          </div>
+
+          <div class="details-card">
+            <div class="details-title">Datele dumneavoastră de contact</div>
+            <div class="details-row">
+              <span class="details-label">Nume părinte:</span>
+              <span class="details-value">${escapeHtml(data.parentName)}</span>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Telefon:</span>
+              <span class="details-value">${escapeHtml(data.phone)}</span>
+            </div>
+            <div class="details-row">
+              <span class="details-label">E-mail:</span>
+              <span class="details-value">${escapeHtml(data.email)}</span>
             </div>
           </div>
 
