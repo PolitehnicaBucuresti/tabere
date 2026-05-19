@@ -1,0 +1,8 @@
+services:
+  web:
+    build: .
+    # Host port: use 0 for Docker to pick a free port (default). Pin e.g. 3000 with HOST_PORT=3000.
+    ports:
+      - "${HOST_PORT:-0}:3000"
+    environment:
+      NODE_ENV: production
