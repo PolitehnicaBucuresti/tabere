@@ -82,13 +82,19 @@ export async function POST(request: NextRequest) {
   // Send SMTP emails
   const emailResult = await sendInscriptionEmails(parsed.data);
   if (!emailResult.success) {
+    console.error("[inscriere] SMTP:", emailResult.error ?? "unknown");
+
     const generic =
       "Înscrierea a fost procesată, dar notificarea prin e-mail a eșuat.";
-    const detail =
-      process.env.NODE_ENV === "development" && emailResult.error
-        ? `${generic} (${emailResult.error})`
-        : generic;
-    return NextResponse.json({ ok: false, error: detail }, { status: 500 });
+
+    return NextResponse.json(
+      {
+        ok: false,
+        error: generic,
+        ...(emailResult.error ? { details: emailResult.error } : {}),
+      },
+      { status: 500 },
+    );
   }
 
   return NextResponse.json({ ok: true });

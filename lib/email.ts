@@ -2,6 +2,15 @@ import nodemailer from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
 import { InscriptionPayload } from "./inscription-schema";
 
+/** Strip characters that break SMTP headers or MIME display-name wrapping. */
+function sanitizeHeaderDisplayName(value: string, max = 72): string {
+  return value.replace(/[\r\n<>]/g, " ").replace(/"/g, "'").trim().slice(0, max);
+}
+
+function sanitizeSubjectPart(value: string, max = 100): string {
+  return value.replace(/[\r\n]/g, " ").trim().slice(0, max);
+}
+
 function createSmtpTransporter() {
   const host = process.env.SMTP_HOST?.trim() || "relay.upb.ro";
   const port = Number.parseInt(process.env.SMTP_PORT?.trim() || "25", 10);
@@ -19,6 +28,12 @@ function createSmtpTransporter() {
       rejectUnauthorized: false,
     },
   };
+
+  // Port 587 expects STARTTLS (plain socket first); 465 is implicit TLS.
+  if (port === 587) {
+    options.secure = false;
+    options.requireTLS = true;
+  }
 
   if (user && pass) {
     options.auth = { user, pass };
@@ -492,31 +507,31 @@ export async function sendInscriptionEmails(data: InscriptionPayload): Promise<{
 
     const transporter = createSmtpTransporter();
 
+    const safeParentName = sanitizeHeaderDisplayName(data.parentName);
+    const safeChildName = sanitizeSubjectPart(data.childName);
+
     // 1. Send email to Administrator
     const adminMailOptions = {
-      from: `"${data.parentName} via Poli Summer Camp" <${smtpFrom}>`,
+      from: `"${safeParentName} via Poli Summer Camp" <${smtpFrom}>`,
       to: adminInbox,
-      subject: `[Înscriere Nouă] ${data.childName} - ${data.ageCategory} - ${data.series}`,
+      subject: `[Înscriere Nouă] ${safeChildName} - ${data.ageCategory} - ${data.series}`,
       html: getAdminEmailHtml(data),
-      replyTo: data.email, // Allow the admin to click reply directly to reach the parent
+      replyTo: data.email,
     };
 
     // 2. Send email to Parent
     const parentMailOptions = {
       from: `"Poli Summer Camp" <${smtpFrom}>`,
       to: data.email,
-      subject: `Înscriere înregistrată - Poli Summer Camp (${data.childName})`,
+      subject: `Înscriere înregistrată - Poli Summer Camp (${safeChildName})`,
       html: getParentConfirmationHtml(data),
     };
 
-    // Send both emails in parallel
-    const [adminResult, parentResult] = await Promise.all([
-      transporter.sendMail(adminMailOptions),
-      transporter.sendMail(parentMailOptions),
-    ]);
+    // Sequential delivery — some relays reject parallel MAIL FROM on one connection.
+    await transporter.sendMail(adminMailOptions);
+    await transporter.sendMail(parentMailOptions);
 
-    console.log("Admin notification sent:", adminResult.messageId);
-    console.log("Parent confirmation sent:", parentResult.messageId);
+    console.log("Inscription emails sent (admin + parent).");
 
     return { success: true };
   } catch (error: unknown) {

@@ -91,6 +91,7 @@ export default function Home() {
   const [selectedAgeCategory, setSelectedAgeCategory] = useState<InscriptionAgeCategory>(INSCRIPTION_AGE_CATEGORIES[0]);
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [formError, setFormError] = useState<string | null>(null);
+  const [smtpDiag, setSmtpDiag] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<InscriptionFieldKey, string>>>({});
   const feedbackRef = useRef<HTMLParagraphElement>(null);
   const currentYear = new Date().getFullYear();
@@ -129,6 +130,7 @@ export default function Home() {
   async function handleInscriptionSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setFormError(null);
+    setSmtpDiag(null);
     setFieldErrors({});
 
     const formEl = event.currentTarget;
@@ -185,9 +187,9 @@ export default function Home() {
         signal: controller.signal,
       });
 
-      let data: { ok?: boolean; error?: string } = {};
+      let data: { ok?: boolean; error?: string; details?: string } = {};
       try {
-        data = (await res.json()) as { ok?: boolean; error?: string };
+        data = (await res.json()) as { ok?: boolean; error?: string; details?: string };
       } catch {
         data = {};
       }
@@ -196,12 +198,14 @@ export default function Home() {
         setFormStatus("error");
         const msg = data.error ?? "A apărut o problemă la trimitere. Încearcă din nou.";
         setFormError(msg);
-        toast.error(msg);
+        setSmtpDiag(typeof data.details === "string" ? data.details : null);
+        toast.error(msg, data.details ? { description: data.details } : undefined);
         return;
       }
 
       setFieldErrors({});
       setFormError(null);
+      setSmtpDiag(null);
       setFormStatus("success");
       formEl.reset();
       setSelectedAgeCategory(INSCRIPTION_AGE_CATEGORIES[0]);
@@ -454,7 +458,14 @@ export default function Home() {
                     </p>
                   ) : null}
                   {formStatus === "error" && formError ? (
-                    <p className="signupFormStatus signupFormStatusError">{formError}</p>
+                    <div className="signupFormErrorStack">
+                      <p className="signupFormStatus signupFormStatusError">{formError}</p>
+                      {smtpDiag ? (
+                        <p className="signupFormSmtpDetail" role="status">
+                          {smtpDiag}
+                        </p>
+                      ) : null}
+                    </div>
                   ) : null}
                 </div>
 

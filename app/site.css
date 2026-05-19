@@ -853,6 +853,25 @@ a {
   color: #9b2c2c;
 }
 
+.signupFormErrorStack {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.signupFormSmtpDetail {
+  margin: 0;
+  padding: 0.55rem 0.72rem;
+  border-radius: 10px;
+  border: 1px dashed #d4a5a5;
+  background: rgba(255, 250, 250, 0.95);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #6b2c2c;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+}
+
 .fieldErrorMessage {
   display: block;
   margin-top: 0.28rem;

@@ -1,6 +1,9 @@
 services:
   web:
     build: .
+    # Inject SMTP_* and other secrets at runtime (host .env next to this file).
+    env_file:
+      - .env
     # Host port: use 0 for Docker to pick a free port (default). Pin e.g. 3000 with HOST_PORT=3000.
     ports:
       - "${HOST_PORT:-0}:3000"
