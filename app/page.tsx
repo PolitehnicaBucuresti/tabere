@@ -1,8 +1,11 @@
  "use client";
 
 import Image from "next/image";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
 import { type InscriptionAgeCategory, INSCRIPTION_AGE_CATEGORIES, INSCRIPTION_SERIES_OPTIONS } from "@/lib/inscription-constants";
+import { inscriptionPayloadSchema, type InscriptionPayload } from "@/lib/inscription-schema";
 import {
   CalendarDays,
   Clock3,
@@ -16,6 +19,63 @@ import {
   Users,
 } from "lucide-react";
 import MouseAura from "./components/MouseAura";
+
+type InscriptionFieldKey = keyof InscriptionPayload;
+
+const INSCRIPTION_FIELD_SCROLL_ORDER: InscriptionFieldKey[] = [
+  "parentName",
+  "phone",
+  "email",
+  "childName",
+  "age",
+  "school",
+  "ageCategory",
+  "series",
+  "medicalInfo",
+  "gdpr",
+];
+
+function issuesToFieldRecord(err: z.ZodError): Partial<Record<InscriptionFieldKey, string>> {
+  const acc: Partial<Record<InscriptionFieldKey, string>> = {};
+  for (const issue of err.issues) {
+    const key = issue.path[0];
+    if (typeof key === "string" && acc[key as InscriptionFieldKey] === undefined) {
+      acc[key as InscriptionFieldKey] = issue.message;
+    }
+  }
+  return acc;
+}
+
+function scrollToFirstFieldError(errors: Partial<Record<InscriptionFieldKey, string>>) {
+  requestAnimationFrame(() => {
+    for (const field of INSCRIPTION_FIELD_SCROLL_ORDER) {
+      if (!errors[field]) continue;
+      if (field === "ageCategory") {
+        document.getElementById("inscription-age-tabs")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      if (field === "series") {
+        document.getElementById("inscription-series-fieldset")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      const el = document.querySelector<HTMLElement>(`[name="${field}"]`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.focus();
+        return;
+      }
+    }
+  });
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <span className="fieldErrorMessage" role="alert">
+      {message}
+    </span>
+  );
+}
 
 type ScheduleRow = {
   interval: string;
@@ -31,7 +91,17 @@ export default function Home() {
   const [selectedAgeCategory, setSelectedAgeCategory] = useState<InscriptionAgeCategory>(INSCRIPTION_AGE_CATEGORIES[0]);
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<InscriptionFieldKey, string>>>({});
+  const feedbackRef = useRef<HTMLParagraphElement>(null);
   const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    if (formStatus !== "success") return;
+    const id = requestAnimationFrame(() => {
+      feedbackRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [formStatus]);
 
   const schedule: ScheduleRow[] = [
     { interval: "08:30 - 09:30", day1: "Sosire copii", day2: "Sosire copii", day3: "Sosire copii", day4: "Sosire copii", day5: "Sosire copii" },
@@ -59,6 +129,7 @@ export default function Home() {
   async function handleInscriptionSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setFormError(null);
+    setFieldErrors({});
 
     const formEl = event.currentTarget;
     const fd = new FormData(formEl);
@@ -69,27 +140,37 @@ export default function Home() {
       return;
     }
 
-    if (!fd.get("gdpr")) {
-      setFormStatus("error");
-      setFormError("Este necesar consimțământul pentru prelucrarea datelor.");
-      return;
-    }
-
     const seriesValue = fd.get("series");
     const series = typeof seriesValue === "string" ? seriesValue : "";
+
+    const gdprAccepted = fd.get("gdpr") === "on";
+    const ageRaw = fd.get("age");
+    const age =
+      typeof ageRaw !== "string" || ageRaw.trim() === "" ? null : Number(ageRaw);
 
     const payload = {
       parentName: String(fd.get("parentName") ?? "").trim(),
       phone: String(fd.get("phone") ?? "").trim(),
       email: String(fd.get("email") ?? "").trim(),
       childName: String(fd.get("childName") ?? "").trim(),
-      age: Number(fd.get("age")),
+      age,
       school: String(fd.get("school") ?? "").trim(),
       series,
       medicalInfo: String(fd.get("medicalInfo") ?? "").trim(),
-      gdpr: true as const,
-      ageCategory: String(fd.get("ageCategory") ?? "").trim() || selectedAgeCategory,
+      gdpr: gdprAccepted,
+      ageCategory:
+        (String(fd.get("ageCategory") ?? "").trim() || selectedAgeCategory) as InscriptionPayload["ageCategory"],
     };
+
+    const validated = inscriptionPayloadSchema.safeParse(payload);
+    if (!validated.success) {
+      const fe = issuesToFieldRecord(validated.error);
+      setFieldErrors(fe);
+      setFormStatus("idle");
+      toast.warning("Verifică câmpurile marcate mai jos.");
+      scrollToFirstFieldError(fe);
+      return;
+    }
 
     setFormStatus("submitting");
 
@@ -100,7 +181,7 @@ export default function Home() {
       const res = await fetch("/api/inscriere", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(validated.data),
         signal: controller.signal,
       });
 
@@ -113,23 +194,46 @@ export default function Home() {
 
       if (!res.ok || !data.ok) {
         setFormStatus("error");
-        setFormError(data.error ?? "A apărut o problemă la trimitere. Încearcă din nou.");
+        const msg = data.error ?? "A apărut o problemă la trimitere. Încearcă din nou.";
+        setFormError(msg);
+        toast.error(msg);
         return;
       }
 
+      setFieldErrors({});
+      setFormError(null);
       setFormStatus("success");
       formEl.reset();
       setSelectedAgeCategory(INSCRIPTION_AGE_CATEGORIES[0]);
     } catch (err) {
       setFormStatus("error");
       if (err instanceof DOMException && err.name === "AbortError") {
-        setFormError("Cererea a durat prea mult (SMTP sau rețea). Încearcă din nou sau verifică serverul de mail.");
+        const msg =
+          "Cererea a durat prea mult (SMTP sau rețea). Încearcă din nou sau verifică serverul de mail.";
+        setFormError(msg);
+        toast.error(msg);
       } else {
-        setFormError("Nu am putut trimite cererea. Verifică conexiunea și încearcă din nou.");
+        const msg = "Nu am putut trimite cererea. Verifică conexiunea și încearcă din nou.";
+        setFormError(msg);
+        toast.error(msg);
       }
     } finally {
       clearTimeout(timeoutId);
     }
+  }
+
+  function clearFieldErrorFromTarget(target: EventTarget | null) {
+    if (!(target instanceof HTMLInputElement) && !(target instanceof HTMLTextAreaElement)) {
+      return;
+    }
+    const name = target.name;
+    if (!name) return;
+    setFieldErrors((prev) => {
+      if (!prev[name as InscriptionFieldKey]) return prev;
+      const next = { ...prev };
+      delete next[name as InscriptionFieldKey];
+      return next;
+    });
   }
 
   return (
@@ -317,7 +421,12 @@ export default function Home() {
           </div>
           <div className="signupLayout">
             <div className="signupFormPanel">
-              <form className="signupForm" onSubmit={handleInscriptionSubmit}>
+              <form
+                className="signupForm"
+                noValidate
+                onSubmit={handleInscriptionSubmit}
+                onInput={(e) => clearFieldErrorFromTarget(e.target)}
+              >
                 <div className="inscriptionHoneypotWrap" aria-hidden="true">
                   <label>
                     Website organizație
@@ -336,7 +445,11 @@ export default function Home() {
                     <p className="signupFormStatus signupFormStatusNeutral">Se trimite cererea...</p>
                   ) : null}
                   {formStatus === "success" ? (
-                    <p className="signupFormStatus signupFormStatusSuccess">
+                    <p
+                      ref={feedbackRef}
+                      tabIndex={-1}
+                      className="signupFormStatus signupFormStatusSuccess"
+                    >
                       Cererea a fost trimisă. Veți fi contactat în curând pentru confirmare.
                     </p>
                   ) : null}
@@ -345,7 +458,12 @@ export default function Home() {
                   ) : null}
                 </div>
 
-                <div className="ageTabs" role="tablist" aria-label="Categorie de vârstă pentru înscriere">
+                <div
+                  id="inscription-age-tabs"
+                  className={`ageTabs ${fieldErrors.ageCategory ? "fieldGroupInvalid" : ""}`}
+                  role="tablist"
+                  aria-label="Categorie de vârstă pentru înscriere"
+                >
                   {INSCRIPTION_AGE_CATEGORIES.map((category) => (
                     <button
                       key={category}
@@ -353,50 +471,150 @@ export default function Home() {
                       role="tab"
                       className={`ageTab ${selectedAgeCategory === category ? "isActive" : ""}`}
                       aria-selected={selectedAgeCategory === category}
-                      onClick={() => setSelectedAgeCategory(category)}
+                      onClick={() => {
+                        setSelectedAgeCategory(category);
+                        setFieldErrors((prev) => {
+                          if (!prev.ageCategory) return prev;
+                          const next = { ...prev };
+                          delete next.ageCategory;
+                          return next;
+                        });
+                      }}
                     >
                       {category}
                     </button>
                   ))}
                 </div>
-                <input type="hidden" name="ageCategory" value={selectedAgeCategory} required />
+                <FieldError message={fieldErrors.ageCategory} />
+                <input type="hidden" name="ageCategory" value={selectedAgeCategory} />
 
                 <fieldset>
                   <legend>Date părinte</legend>
-                  <label>Nume și prenume părinte<input type="text" name="parentName" required /></label>
-                  <label>Telefon<input type="tel" name="phone" required /></label>
-                  <label>E-mail<input type="email" name="email" required /></label>
+                  <label className="signupFieldLabel">
+                    <span className="signupFieldLabelText">Nume și prenume părinte</span>
+                    <input
+                      type="text"
+                      name="parentName"
+                      autoComplete="name"
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.parentName}
+                      className={fieldErrors.parentName ? "inputInvalid" : undefined}
+                    />
+                    <FieldError message={fieldErrors.parentName} />
+                  </label>
+                  <label className="signupFieldLabel">
+                    <span className="signupFieldLabelText">Telefon</span>
+                    <input
+                      type="tel"
+                      name="phone"
+                      autoComplete="tel"
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.phone}
+                      className={fieldErrors.phone ? "inputInvalid" : undefined}
+                    />
+                    <FieldError message={fieldErrors.phone} />
+                  </label>
+                  <label className="signupFieldLabel">
+                    <span className="signupFieldLabelText">E-mail</span>
+                    <input
+                      type="email"
+                      name="email"
+                      autoComplete="email"
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.email}
+                      className={fieldErrors.email ? "inputInvalid" : undefined}
+                    />
+                    <FieldError message={fieldErrors.email} />
+                  </label>
                 </fieldset>
 
                 <fieldset>
                   <legend>Date copil</legend>
-                  <label>Nume și prenume copil<input type="text" name="childName" required /></label>
-                  <label>Vârsta copilului<input type="number" name="age" min={5} max={11} required /></label>
-                  <label>Școala unde este înscris<input type="text" name="school" required /></label>
+                  <label className="signupFieldLabel">
+                    <span className="signupFieldLabelText">Nume și prenume copil</span>
+                    <input
+                      type="text"
+                      name="childName"
+                      autoComplete="off"
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.childName}
+                      className={fieldErrors.childName ? "inputInvalid" : undefined}
+                    />
+                    <FieldError message={fieldErrors.childName} />
+                  </label>
+                  <label className="signupFieldLabel">
+                    <span className="signupFieldLabelText">Vârsta copilului</span>
+                    <input
+                      type="number"
+                      name="age"
+                      min={5}
+                      max={11}
+                      inputMode="numeric"
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.age}
+                      className={fieldErrors.age ? "inputInvalid" : undefined}
+                    />
+                    <FieldError message={fieldErrors.age} />
+                  </label>
+                  <label className="signupFieldLabel">
+                    <span className="signupFieldLabelText">Școala unde este înscris</span>
+                    <input
+                      type="text"
+                      name="school"
+                      autoComplete="organization"
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.school}
+                      className={fieldErrors.school ? "inputInvalid" : undefined}
+                    />
+                    <FieldError message={fieldErrors.school} />
+                  </label>
                 </fieldset>
 
-                <fieldset>
+                <fieldset
+                  id="inscription-series-fieldset"
+                  className={fieldErrors.series ? "fieldsetHasError" : undefined}
+                  aria-required="true"
+                >
                   <legend>Alegerea programului</legend>
                   {INSCRIPTION_SERIES_OPTIONS.map((option) => (
                     <label key={option} className="checkboxLabel radioLabel">
-                      <input type="radio" name="series" value={option} required />
+                      <input type="radio" name="series" value={option} />
                       {option}
                     </label>
                   ))}
+                  <FieldError message={fieldErrors.series} />
                 </fieldset>
 
                 <fieldset>
                   <legend>Informații importante</legend>
-                  <label>
-                    Alergii sau afecțiuni medicale (dacă este cazul)
-                    <textarea name="medicalInfo" rows={4} required />
+                  <label className="signupFieldLabel">
+                    <span className="signupFieldLabelText">
+                      Alergii sau afecțiuni medicale (dacă este cazul)
+                    </span>
+                    <textarea
+                      name="medicalInfo"
+                      rows={4}
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.medicalInfo}
+                      className={fieldErrors.medicalInfo ? "inputInvalid" : undefined}
+                    />
+                    <FieldError message={fieldErrors.medicalInfo} />
                   </label>
                 </fieldset>
 
-                <label className="checkboxLabel">
-                  <input type="checkbox" name="gdpr" required />
-                  Sunt de acord cu prelucrarea datelor personale pentru înscrierea în tabără.
-                </label>
+                <div className={`gdprRow ${fieldErrors.gdpr ? "fieldGroupInvalid" : ""}`}>
+                  <label className="checkboxLabel gdprCheckboxLabel">
+                    <input
+                      type="checkbox"
+                      name="gdpr"
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.gdpr}
+                    />
+                    Sunt de acord cu prelucrarea datelor personale pentru înscrierea în tabără.
+                  </label>
+                  <FieldError message={fieldErrors.gdpr} />
+                </div>
+
                 <button type="submit" disabled={formStatus === "submitting"} aria-busy={formStatus === "submitting"}>
                   Înscrie copilul
                 </button>

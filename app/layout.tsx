@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import StructuredData from "./structured-data";
+import AppToaster from "./components/AppToaster";
 import "./site.css";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -92,6 +93,7 @@ export default function RootLayout({
     <html lang="ro" className={geistSans.variable}>
       <body>
         <StructuredData />
+        <AppToaster />
         {children}
       </body>
     </html>

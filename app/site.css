@@ -853,6 +853,55 @@ a {
   color: #9b2c2c;
 }
 
+.fieldErrorMessage {
+  display: block;
+  margin-top: 0.28rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #b42318;
+  line-height: 1.35;
+}
+
+.signupFieldLabel {
+  display: grid;
+  gap: 0.34rem;
+}
+
+.signupFieldLabel .signupFieldLabelText {
+  color: #2c4270;
+}
+
+.inputInvalid {
+  border-color: #d48484 !important;
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.12);
+}
+
+.fieldsetHasError {
+  border-color: #e8a4a4 !important;
+}
+
+.ageTabs.fieldGroupInvalid {
+  outline: 2px solid rgba(180, 35, 24, 0.35);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+.gdprRow.fieldGroupInvalid {
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid rgba(180, 35, 24, 0.35);
+  background: rgba(255, 244, 244, 0.65);
+}
+
+.gdprCheckboxLabel {
+  align-items: flex-start;
+}
+
+.appToasterToast {
+  border-radius: 14px !important;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif !important;
+}
+
 button[type="submit"]:disabled {
   cursor: not-allowed;
   opacity: 0.72;
