@@ -93,11 +93,15 @@ export default function Home() {
 
     setFormStatus("submitting");
 
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 25_000);
+
     try {
       const res = await fetch("/api/inscriere", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
+        signal: controller.signal,
       });
 
       let data: { ok?: boolean; error?: string } = {};
@@ -116,9 +120,15 @@ export default function Home() {
       setFormStatus("success");
       formEl.reset();
       setSelectedAgeCategory(INSCRIPTION_AGE_CATEGORIES[0]);
-    } catch {
+    } catch (err) {
       setFormStatus("error");
-      setFormError("Nu am putut trimite cererea. Verifică conexiunea și încearcă din nou.");
+      if (err instanceof DOMException && err.name === "AbortError") {
+        setFormError("Cererea a durat prea mult (SMTP sau rețea). Încearcă din nou sau verifică serverul de mail.");
+      } else {
+        setFormError("Nu am putut trimite cererea. Verifică conexiunea și încearcă din nou.");
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 

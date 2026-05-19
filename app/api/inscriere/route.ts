@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { inscriptionPayloadSchema } from "@/lib/inscription-schema";
+import { sendInscriptionEmails } from "@/lib/email";
 
 function getAllowedOrigins(): string[] | null {
   const explicit = process.env.INSCRIPTION_ALLOWED_ORIGINS?.trim();
@@ -18,7 +19,23 @@ function getAllowedOrigins(): string[] | null {
   }
 }
 
+/** Local browser hits (next dev / next start on this machine) — avoid blocking when NEXT_PUBLIC_SITE_URL is the prod canonical URL. */
+function isLocalBrowserHost(request: NextRequest): boolean {
+  const raw = request.headers.get("host");
+  if (!raw) return false;
+  try {
+    const hostname = new URL(`http://${raw}`).hostname.toLowerCase();
+    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+  } catch {
+    return false;
+  }
+}
+
 function isOriginAllowed(request: NextRequest): boolean {
+  if (isLocalBrowserHost(request)) {
+    return true;
+  }
+
   const allowed = getAllowedOrigins();
   if (!allowed?.length) return true;
 
@@ -60,6 +77,18 @@ export async function POST(request: NextRequest) {
   const parsed = inscriptionPayloadSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: "Date invalide sau incomplete." }, { status: 400 });
+  }
+
+  // Send SMTP emails
+  const emailResult = await sendInscriptionEmails(parsed.data);
+  if (!emailResult.success) {
+    const generic =
+      "Înscrierea a fost procesată, dar notificarea prin e-mail a eșuat.";
+    const detail =
+      process.env.NODE_ENV === "development" && emailResult.error
+        ? `${generic} (${emailResult.error})`
+        : generic;
+    return NextResponse.json({ ok: false, error: detail }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });
