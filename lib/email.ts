@@ -11,6 +11,21 @@ function sanitizeSubjectPart(value: string, max = 100): string {
   return value.replace(/[\r\n]/g, " ").trim().slice(0, max);
 }
 
+/** Trim, drop empties, dedupe addresses case-insensitively (for To/Cc). */
+function uniqueRecipientList(...emails: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of emails) {
+    const e = raw.trim();
+    if (!e) continue;
+    const key = e.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(e);
+  }
+  return out;
+}
+
 function createSmtpTransporter() {
   const host = process.env.SMTP_HOST?.trim() || "relay.upb.ro";
   const port = Number.parseInt(process.env.SMTP_PORT?.trim() || "25", 10);
@@ -486,8 +501,9 @@ function getParentConfirmationHtml(data: InscriptionPayload): string {
 /**
  * Sends a registration email.
  * This will send:
- * 1. An notification email to the administrator (CONTACT_FORM_TO_EMAIL)
- * 2. A confirmation email to the parent (data.email)
+ * 1. A notification with full application data to CONTACT_FORM_TO_EMAIL (default online.team@upb.ro)
+ *    and always to marketing@upb.ro for review (override via INSCRIPTION_MARKETING_REVIEW_EMAIL).
+ * 2. A confirmation email to the parent (data.email).
  */
 export async function sendInscriptionEmails(data: InscriptionPayload): Promise<{ success: boolean; error?: string }> {
   try {
@@ -497,6 +513,8 @@ export async function sendInscriptionEmails(data: InscriptionPayload): Promise<{
       "";
     const adminInbox =
       process.env.CONTACT_FORM_TO_EMAIL?.trim() || "online.team@upb.ro";
+    const marketingReviewEmail =
+      process.env.INSCRIPTION_MARKETING_REVIEW_EMAIL?.trim() || "marketing@upb.ro";
 
     if (!smtpFrom) {
       return {
@@ -505,21 +523,29 @@ export async function sendInscriptionEmails(data: InscriptionPayload): Promise<{
       };
     }
 
+    const adminRecipients = uniqueRecipientList(adminInbox, marketingReviewEmail);
+    if (adminRecipients.length === 0) {
+      return {
+        success: false,
+        error: "Nu există destinatari pentru notificarea administratorului.",
+      };
+    }
+
     const transporter = createSmtpTransporter();
 
     const safeParentName = sanitizeHeaderDisplayName(data.parentName);
     const safeChildName = sanitizeSubjectPart(data.childName);
 
-    // 1. Send email to Administrator
+    // 1. Staff notification (same HTML body to every recipient — full form data)
     const adminMailOptions = {
       from: `"${safeParentName} via Poli Summer Camp" <${smtpFrom}>`,
-      to: adminInbox,
+      to: adminRecipients,
       subject: `[Înscriere Nouă] ${safeChildName} - ${data.ageCategory} - ${data.series}`,
       html: getAdminEmailHtml(data),
       replyTo: data.email,
     };
 
-    // 2. Send email to Parent
+    // 2. Parent confirmation
     const parentMailOptions = {
       from: `"Poli Summer Camp" <${smtpFrom}>`,
       to: data.email,
@@ -531,7 +557,7 @@ export async function sendInscriptionEmails(data: InscriptionPayload): Promise<{
     await transporter.sendMail(adminMailOptions);
     await transporter.sendMail(parentMailOptions);
 
-    console.log("Inscription emails sent (admin + parent).");
+    console.log("Inscription emails sent (staff + parent).", { staff: adminRecipients });
 
     return { success: true };
   } catch (error: unknown) {
