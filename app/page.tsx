@@ -246,6 +246,9 @@ export default function Home() {
 
   return (
     <div className="siteWrap">
+      <a href="#main-content" className="skipLink">
+        Salt la conținutul principal
+      </a>
       <header className="heroPanel" id="intro">
         <MouseAura targetId="intro" />
         <nav className="topNav">
@@ -309,7 +312,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="contentGrid">
+      <main id="main-content" className="contentGrid">
         <section id="despre" className="sectionCard">
           <div className="aboutMosaic">
             <article className="aboutText">

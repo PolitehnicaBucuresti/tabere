@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import StructuredData from "./structured-data";
 import AppToaster from "./components/AppToaster";
@@ -19,6 +19,12 @@ const title = {
 const description =
   "Tabere urbane POLITEHNICA București pentru copii curioși: activități interactive, ateliere practice și înscriere online.";
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#eef3fb",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title,
@@ -37,6 +43,8 @@ export const metadata: Metadata = {
   authors: [{ name: siteName, url: siteUrl }],
   creator: siteName,
   publisher: "Universitatea Națională de Știință și Tehnologie POLITEHNICA București",
+  category: "education",
+  referrer: "origin-when-cross-origin",
   robots: {
     index: true,
     follow: true,

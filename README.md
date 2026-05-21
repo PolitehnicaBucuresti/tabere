@@ -45,3 +45,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - **Raport zilnic 09:00 (Europe/Bucharest):** destinatari în „Notificări zilnice”; cron în `instrumentation.ts`. Oprire: `DISABLE_DAILY_CRON=1`. Manual: `POST /api/admin/cron/daily` cu `Authorization: Bearer <CRON_SECRET>`.
 
 Înscrierile publice sunt persistate înainte de e-mailuri (`/api/inscriere`).
+
+## Deploy automat (GitHub Actions)
+
+Vezi [docs/GITHUB_ACTIONS.md](docs/GITHUB_ACTIONS.md) pentru workflow-ul SSH către VM și lista de secrets (`VM_HOST`, `VM_USER`, `VM_SSH_PRIVATE_KEY`, `VM_DEPLOY_PATH`).

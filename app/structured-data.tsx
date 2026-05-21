@@ -74,6 +74,16 @@ export default function StructuredData() {
         image: [heroImageUrl],
         startDate: `${year}-06-22`,
         endDate: `${year}-07-17`,
+        offers: {
+          "@type": "Offer",
+          price: "1100",
+          priceCurrency: "RON",
+          availability: "https://schema.org/InStock",
+          url: `${siteUrl}/#inscriere`,
+          validFrom: `${year}-01-01`,
+          description:
+            "Tarif orientativ pe săptămână per copil; discount frați 20%. Include masă, materiale și asistență medicală.",
+        },
       },
     ],
   };

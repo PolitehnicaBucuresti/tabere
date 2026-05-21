@@ -75,6 +75,34 @@ body {
   background: #eef3fb;
 }
 
+.skipLink {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.skipLink:focus {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 10000;
+  width: auto;
+  height: auto;
+  clip-path: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--card-shadow);
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  font-weight: 600;
+}
+
 h1,
 h2,
 h3,
