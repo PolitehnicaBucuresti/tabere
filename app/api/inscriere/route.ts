@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { inscriptionPayloadSchema } from "@/lib/inscription-schema";
 import { sendInscriptionEmails } from "@/lib/email";
+import { prisma } from "@/lib/prisma";
 
 function getAllowedOrigins(): string[] | null {
   const explicit = process.env.INSCRIPTION_ALLOWED_ORIGINS?.trim();
@@ -79,8 +80,34 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Date invalide sau incomplete." }, { status: 400 });
   }
 
+  const d = parsed.data;
+  try {
+    await prisma.application.create({
+      data: {
+        parentName: d.parentName,
+        phone: d.phone,
+        email: d.email,
+        childName: d.childName,
+        age: d.age,
+        school: d.school,
+        series: d.series,
+        ageCategory: d.ageCategory,
+        medicalInfo: d.medicalInfo,
+        childPassions: d.childPassions,
+        organizerNotes: d.organizerNotes,
+        gdprAccepted: true,
+      },
+    });
+  } catch (e) {
+    console.error("[inscriere] DB:", e);
+    return NextResponse.json(
+      { ok: false, error: "Înscrierea nu a putut fi salvată. Încercați din nou sau contactați organizatorii." },
+      { status: 500 },
+    );
+  }
+
   // Send SMTP emails
-  const emailResult = await sendInscriptionEmails(parsed.data);
+  const emailResult = await sendInscriptionEmails(d);
   if (!emailResult.success) {
     console.error("[inscriere] SMTP:", emailResult.error ?? "unknown");
 

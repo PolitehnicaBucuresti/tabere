@@ -34,3 +34,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Database & panou admin
+
+- **PostgreSQL** via Docker Compose (`db` service). Set `DB_PASSWORD` in `.env`; `DATABASE_URL` este setat în `docker-compose` pentru serviciul `web`.
+- **Migrations:** `npx prisma migrate deploy` (rulează automat în Docker înainte de `npm start`).
+- **Panou (URL discret):** `/parc-tabere-7qm2x9` — configurare în `lib/admin-config.ts` (`ADMIN_PATH_SEGMENT`); redenumirea necesită actualizare foldere `app/parc-tabere-7qm2x9` și `middleware.ts` matcher.
+- **Parolă implicită** (înlocuiește în producție cu `ADMIN_PASSWORD`): `UpbTabere#adm_k7n2`. `ADMIN_SESSION_SECRET` obligatoriu puternic în producție.
+- **Export:** Excel `.xlsx` din lista de înscrieri.
+- **Raport zilnic 09:00 (Europe/Bucharest):** destinatari în „Notificări zilnice”; cron în `instrumentation.ts`. Oprire: `DISABLE_DAILY_CRON=1`. Manual: `POST /api/admin/cron/daily` cu `Authorization: Bearer <CRON_SECRET>`.
+
+Înscrierile publice sunt persistate înainte de e-mailuri (`/api/inscriere`).

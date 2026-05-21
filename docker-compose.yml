@@ -1,33 +1,55 @@
 services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tabere
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-tabere_change_me}
+      POSTGRES_DB: tabere
+    volumes:
+      - tabere_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tabere -d tabere"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+    # Dev: Prisma CLI de pe host (migrate dev) → 127.0.0.1:5432
+    # Dacă ai Postgres local pe 5432, folosește 127.0.0.1:5433:5432 și port 5433 în DATABASE_URL.
+    ports:
+      - "127.0.0.1:5432:5432"
+
   web:
     build: .
+    depends_on:
+      db:
+        condition: service_healthy
     # Inject SMTP_* and other secrets at runtime (host .env next to this file).
     env_file:
       - .env
     environment:
       NODE_ENV: production
-    # Routed by Traefik — no host ports needed (see bottom for optional debug publish).
+      DATABASE_URL: postgresql://tabere:${DB_PASSWORD:-tabere_change_me}@db:5432/tabere?schema=public
+    # Routed by Traefik — no host ports needed.
     networks:
+      - internal
       - traefik
     labels:
       - traefik.enable=true
-      # Must match the real Docker network name Traefik uses (see `docker network ls`).
       - traefik.docker.network=${TRAEFIK_NETWORK:-traefik_default}
-      # Public hostname — set TABERE_HOST in .env if different from tabere.upb.ro
-      - traefik.http.routers.tabere.rule=Host(`${TABERE_HOST:-tabere.upb.ro}`)
-      - traefik.http.routers.tabere.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}
-      - traefik.http.routers.tabere.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-letsencrypt}
-      - traefik.http.routers.tabere.service=tabere
-      - traefik.http.services.tabere.loadbalancer.server.port=3000
+      - traefik.http.routers.psc-tabere.rule=Host(`${TABERE_HOST:-tabere.upb.ro}`)
+      - traefik.http.routers.psc-tabere.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}
+      - traefik.http.routers.psc-tabere.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-letsencrypt}
+      - traefik.http.routers.psc-tabere.service=psc-tabere-svc
+      - traefik.http.services.psc-tabere-svc.loadbalancer.server.port=3000
 
 networks:
+  internal:
+    driver: bridge
   traefik:
     external: true
     name: ${TRAEFIK_NETWORK:-traefik_default}
 
-# Optional: expose Next directly on the VM for debugging (bypass Traefik):
-#   docker compose --profile debug up -d
-# profiles:
-#   debug:
-#     ports:
-#       - "127.0.0.1:3000:3000"
+volumes:
+  tabere_pgdata:
