@@ -48,4 +48,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Deploy automat (GitHub Actions)
 
-Vezi [docs/GITHUB_ACTIONS.md](docs/GITHUB_ACTIONS.md) pentru workflow-ul SSH către VM și lista de secrets (`VM_HOST`, `VM_USER`, `VM_SSH_PRIVATE_KEY`, `VM_DEPLOY_PATH`).
+Vezi [docs/GITHUB_ACTIONS.md](docs/GITHUB_ACTIONS.md): deploy SSH din cloud SAU **runner self-hosted pe VM** (necesar dacă VM-ul e accesibil doar prin VPN).

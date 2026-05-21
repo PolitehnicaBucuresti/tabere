@@ -10,8 +10,31 @@ concurrency:
   group: deploy-tabere-vm
   cancel-in-progress: true
 
+# VM only reachable behind VPN? Job "deploy-self-hosted". GitHub Cloud cannot SSH there.
+#
+# Repo variable (Settings → Secrets and variables → Actions → Variables → New repository variable):
+#   USE_SELF_HOSTED_DEPLOY = true
+# Install a GitHub Actions self-hosted runner on the VM (or on a machine always on VPN with docker+git):
+
 jobs:
-  deploy:
+  deploy-self-hosted:
+    if: ${{ vars.USE_SELF_HOSTED_DEPLOY == 'true' }}
+    runs-on: self-hosted
+    steps:
+      - name: Pull and Docker Compose
+        env:
+          DEPLOY_PATH: ${{ secrets.VM_DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+          cd "${DEPLOY_PATH}"
+          git fetch origin main
+          git checkout main
+          git pull --ff-only origin main
+          docker compose build web
+          docker compose up -d --remove-orphans
+
+  deploy-over-ssh:
+    if: ${{ vars.USE_SELF_HOSTED_DEPLOY != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: SSH deploy (pull + Docker Compose)
@@ -20,7 +43,7 @@ jobs:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
-          script_stop: true
+          passphrase: ${{ secrets.VM_SSH_KEY_PASSPHRASE }}
           script: |
             set -euo pipefail
             cd "${{ secrets.VM_DEPLOY_PATH }}"

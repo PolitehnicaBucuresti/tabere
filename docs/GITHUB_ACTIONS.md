@@ -1,41 +1,56 @@
 # Deploy automat cu GitHub Actions
 
-Workflow-ul **Deploy to VM** (`.github/workflows/deploy-vm.yml`) rulează la **push pe `main`** și poate fi pornit manual din tab-ul **Actions**.
+Workflow: `.github/workflows/deploy-vm.yml` — pornește la **push pe `main`** și prin **Actions → Run workflow**.
 
-## Ce face pe mașina ta
+## Mașina e doar prin VPN? („no route to host” cu runner GitHub Cloud)
 
-1. Intră în directorul repo-ului (`VM_DEPLOY_PATH`).
-2. Face `git pull --ff-only` de pe `origin main`.
-3. Reconstruiește și repornește serviciul **`web`** cu Docker Compose (`migrate deploy` rulează la start în container, vezi `Dockerfile`).
+Runner-ii **`ubuntu-latest`** rulează **în infrastructura GitHub**. Nu sunt conectați la VPN-ul tău, deci **nu pot deschide TCP la IP-ul privat / host-ul rezolvat doar din VPN**.
 
-Asigură-te că pe VM:
+**În cazul tău:** folosește **self-hosted runner** pe VM sau pe altă stație care este mereu în VPN și are Docker + Git.
 
-- Repo-ul este un checkout git cu **remote `origin`** către acest repository GitHub și branch-ul `main` urmărește `origin/main`.
-- Există `.env` lângă `docker-compose.yml` (SMTP, `DB_PASSWORD`, `NEXT_PUBLIC_SITE_URL`, secrete admin etc.).
-- Utilizatorul SSH are drepturi să ruleze `docker` și `docker compose` în acel folder (ideal membru în grupul `docker` sau rulezi cu același user cu care ai făcut deploy manual).
+### Pași scurți — self-hosted (recomandat la VPN-only)
 
-## Secrets în GitHub
+1. GitHub repo → **Settings → Actions → Runners → New self-hosted runner** — urmează pașii pentru **Linux** și descarcă / configurezi runner-ul **direct pe VM** (sau pe mașina care are acces SSH la mediul unde rulează Compose).
+2. Pornești runner-ul (ideal ca serviciu, vezi ghid GitHub pentru `svc.sh`).
+3. În repo → **Settings → Secrets and variables → Actions → Variables** → creezi **repository variable**:
+
+   **`USE_SELF_HOSTED_DEPLOY`** = **`true`** (exact acest text)
+
+4. Păstrezi în **Secrets**: **`VM_DEPLOY_PATH`** ca **cale absolută** la același checkout folosit pentru deploy (`pwd` în rădacina repoului pe acea mașină).
+
+Atunci workflow-ul ignoră SSH din cloud și rulează comenzile **`docker compose`** local pe acea mașină.
+
+**Secrets SSH** (`VM_HOST`, `VM_USER`, cheia privată etc.) nu mai sunt necesare pentru acest branch al workflow-ului, dar le poți păstra fără probleme dacă vor folosi SSH din cloud altă dată (`USE_SELF_HOSTED_DEPLOY` neechivalent cu `true`).
+
+### Ai SSH public către VM (nu depinzi doar de VPN)
+
+Lasă **`USE_SELF_HOSTED_DEPLOY` ne‑setată** sau **`false`** (sau nu există astfel de variabilă). Atunci workflow-ul folosește job-ul **SSH**. Trebuie port **22** (sau setat explicit) rutabil din internet față de runner-ii GitHub, plus cheie fără parolă pentru CI sau secret **`VM_SSH_KEY_PASSPHRASE`**.
+
+## Ce rulează pe server (în ambele moduri)
+
+1. Intră în `VM_DEPLOY_PATH`.
+2. `git pull --ff-only` pentru `origin main`.
+3. `docker compose build web` și `docker compose up -d` (migrate la start în container).
+
+Asigură-te că checkout-ul este `git clone` către repo-ul GitHub și `origin` e corect.
+
+## Secrets (workflow SSH din cloud — fără self-hosted variable)
 
 În repo: **Settings → Secrets and variables → Actions → New repository secret**:
 
 | Secret | Exemplu | Rol |
 |--------|---------|-----|
-| `VM_HOST` | `203.0.113.50` sau `tabere.upb.ro` | Host SSH |
-| `VM_USER` | `deploy` | User SSH |
-| `VM_SSH_PRIVATE_KEY` | conținutul cheii **private** PEM/OpenSSH | Autentificare (cheia **publică** trebuie în `authorized_keys` pe VM) |
-| `VM_DEPLOY_PATH` | `/home/deploy/tabere` | Cale **absolută** către rădăcina repo-ului pe server |
+| `VM_HOST` | IP public rezolvabil fără VPN | SSH |
+| `VM_USER` | `deploy` | SSH |
+| `VM_SSH_PRIVATE_KEY` | cheie privată | SSH |
+| `VM_SSH_KEY_PASSPHRASE` | *(opțional)* | Doar dacă cheia privată are parolă; altfel omit |
+| `VM_DEPLOY_PATH` | `/home/.../tabere` | În ambele moduri pentru `cd`; la self-hosted și la SSH |
 
-Nu comita niciodată cheia privată în repo.
+## Self-hosted și `script_stop`
 
-### Branch diferit de `main`
+Runner-ul **`appleboy/ssh-action`** nu acceptă `script_stop`; deploy-ul încă se oprește la prima eroare datorită **`set -euo pipefail`** în script.
 
-Editează `.github/workflows/deploy-vm.yml`: înlocuiește `main` cu branch-ul dorit în `on.push.branches` și în pașii `git`.
+## Alternative
 
-### Deploy doar manual
-
-Șterge sau comentează secțiunea `push:` din workflow și folosește doar **Run workflow** din GitHub Actions.
-
-### Alternative
-
-- **Self-hosted runner** pe VM (GitHub „runs-on: self-hosted”) — nu mai ai nevoie de SSH din cloud; runner-ul execută pașii direct pe server.
-- **Dispatche-uri sau protecție:** poți restrânge workflow-ul la tag-uri (`on: push: tags:`) sau folosi **environment** cu approval în GitHub pentru producție.
+- **Pull pe VM în cron**: script local pe VM care rulează `git pull && docker compose up -d` pe interval (fără Actions).
+- **Environment** în GitHub cu approval înainte de deploy pe producție.
