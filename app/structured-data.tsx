@@ -12,8 +12,8 @@ export default function StructuredData() {
       {
         "@type": "Organization",
         "@id": `${siteUrl}/#organization`,
-        name: "Poli Summer Camp",
-        alternateName: ["POLI Summer Camp", "POLI Summer Camp UPB"],
+        name: "Taberele Micilor Ingineri",
+        alternateName: ["Tabere Micilor Ingineri", "Micilor Ingineri UPB"],
         url: siteUrl,
         logo: logoUrl,
         description:
@@ -42,7 +42,7 @@ export default function StructuredData() {
         "@type": "WebSite",
         "@id": `${siteUrl}/#website`,
         url: siteUrl,
-        name: "Poli Summer Camp",
+        name: "Taberele Micilor Ingineri",
         description:
           "Tabere urbane POLITEHNICA București pentru copii curioși: activități interactive, ateliere practice și înscriere online.",
         inLanguage: "ro-RO",
@@ -50,8 +50,8 @@ export default function StructuredData() {
       },
       {
         "@type": "Event",
-        "@id": `${siteUrl}/#summer-camp`,
-        name: `Poli Summer Camp ${year}`,
+        "@id": `${siteUrl}/#tabere-micilor-ingineri`,
+        name: `Taberele Micilor Ingineri ${year}`,
         description:
           "Tabără de vară urbană pe campusul POLITEHNICA București pentru copii între 5 și 11 ani: experimente, ateliere STEM și activități ghidate.",
         eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",

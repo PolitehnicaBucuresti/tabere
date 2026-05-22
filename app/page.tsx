@@ -255,9 +255,9 @@ export default function Home() {
           <div className="topNavRow">
             <a className="brand" href="#intro" onClick={() => setMenuOpen(false)}>
               <span className="brandLogoWrap">
-                <Image src="/Logo_RO_PB(ALB)2.svg" alt="POLI Summer Camp" width={60} height={60} />
+                <Image src="/Logo_RO_PB(ALB)2.svg" alt="Taberele Micilor Ingineri" width={60} height={60} />
               </span>
-              <span>Poli Summer Camp</span>
+              <span>Taberele Micilor Ingineri</span>
             </a>
             <button
               type="button"
@@ -306,7 +306,7 @@ export default function Home() {
             </figure>
             <div className="heroBadgeCard">
               <p>Program pilot</p>
-              <strong>POLI SUMMER CAMP</strong>
+              <strong>TABERELE MICILOR INGINERI</strong>
             </div>
           </div>
         </div>
@@ -328,7 +328,7 @@ export default function Home() {
               </p>
             </article>
             <figure className="mediaCard mediaCardGlow">
-              <Image src="/3.kids-using-electronic-parts-build-robot.jpg" alt="Copii în activități educative la POLI Summer Camp" fill sizes="(max-width: 900px) 100vw, 33vw" style={{ objectPosition: "center 15%" }} />
+              <Image src="/3.kids-using-electronic-parts-build-robot.jpg" alt="Copii în activități educative la Taberele Micilor Ingineri" fill sizes="(max-width: 900px) 100vw, 33vw" style={{ objectPosition: "center 15%" }} />
             </figure>
             {/* <div className="aboutSticker">
               <Sparkles size={16} />
@@ -713,7 +713,7 @@ export default function Home() {
           <div className="locationCollage collageCreative">
             <figure className="mediaCard wide mediaCardGlow"><Image src="/campus-poli.jpg" alt="Campus POLITEHNICA București" fill sizes="(max-width: 900px) 100vw, 38vw" /></figure>
             <figure className="mediaCard mediaCardGlow"><Image src="/ss-campus.png" alt="Campus POLITEHNICA București" fill sizes="(max-width: 900px) 100vw, 30vw" /></figure>
-            <figure className="mediaCard mediaCardGlow"><Image src="/despre_noi.jpg" alt="Copii în activități educative la POLI Summer Camp" fill sizes="(max-width: 900px) 100vw, 30vw" /></figure>
+            <figure className="mediaCard mediaCardGlow"><Image src="/despre_noi.jpg" alt="Copii în activități educative la Taberele Micilor Ingineri" fill sizes="(max-width: 900px) 100vw, 30vw" /></figure>
           </div>
           <div className="locationFacts">
             <span>Spații moderne</span>
@@ -728,9 +728,9 @@ export default function Home() {
           <div className="footerBrand">
             <a className="brand footerBrandLink" href="#intro">
               <span className="brandLogoWrap">
-                <Image src="/Logo_RO_PB(ALB)2.svg" alt="POLI Summer Camp" width={60} height={60} />
+                <Image src="/Logo_RO_PB(ALB)2.svg" alt="Taberele Micilor Ingineri" width={60} height={60} />
               </span>
-              <span>Poli Summer Camp</span>
+              <span>Taberele Micilor Ingineri</span>
             </a>
             <p>Inspirație. Joacă. Distracție.</p>
             <p>Splaiul Independenței nr. 313, București</p>
@@ -752,7 +752,7 @@ export default function Home() {
             <a href="#intro">Înapoi sus</a>
           </div>
         </div>
-        <p className="copyright">© {currentYear} Poli Summer Camp. Toate drepturile rezervate.</p>
+        <p className="copyright">© {currentYear} Taberele Micilor Ingineri. Toate drepturile rezervate.</p>
       </footer>
     </div>
   );

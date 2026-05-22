@@ -5,7 +5,7 @@ import { adminPanouPath } from "@/lib/admin-config";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Panou înscrieri — Poli Summer Camp",
+  title: "Panou înscrieri — Taberele Micilor Ingineri",
   robots: { index: false, follow: false },
 };
 

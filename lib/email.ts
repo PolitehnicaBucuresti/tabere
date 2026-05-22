@@ -80,7 +80,7 @@ function getAdminEmailHtml(data: InscriptionPayload): string {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Înscriere nouă - Poli Summer Camp</title>
+      <title>Înscriere nouă - Taberele Micilor Ingineri</title>
       <style>
         body {
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -200,7 +200,7 @@ function getAdminEmailHtml(data: InscriptionPayload): string {
     <body>
       <div class="container">
         <div class="header">
-          <h1>Înscriere Poli Summer Camp</h1>
+          <h1>Înscriere Taberele Micilor Ingineri</h1>
           <p>Notificare automată de înregistrare în sistem</p>
         </div>
         <div class="content">
@@ -274,7 +274,7 @@ function getAdminEmailHtml(data: InscriptionPayload): string {
           </table>
         </div>
         <div class="footer">
-          <p>Acest e-mail a fost trimis automat de pe serverul Poli Summer Camp.</p>
+          <p>Acest e-mail a fost trimis automat de Taberele Micilor Ingineri.</p>
           <p>&copy; ${new Date().getFullYear()} Universitatea Națională de Științe și Tehnologie POLITEHNICA București</p>
         </div>
       </div>
@@ -293,7 +293,7 @@ function getParentConfirmationHtml(data: InscriptionPayload): string {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Confirmare primire cerere - Poli Summer Camp</title>
+      <title>Confirmare primire cerere - Taberele Micilor Ingineri</title>
       <style>
         body {
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -468,13 +468,13 @@ function getParentConfirmationHtml(data: InscriptionPayload): string {
     <body>
       <div class="container">
         <div class="header">
-          <h1>Poli Summer Camp</h1>
+          <h1>Taberele Micilor Ingineri</h1>
           <p>Cerere de înscriere înregistrată cu succes</p>
         </div>
         <div class="content">
           <div class="greeting">Dragă ${escapeHtml(data.parentName)},</div>
           <div class="intro-text">
-            Vă mulțumim pentru interesul acordat taberei de vară <strong>Poli Summer Camp</strong>! 
+            Vă mulțumim pentru interesul acordat taberei de vară <strong>Taberele Micilor Ingineri</strong>! 
             Am primit cu succes cererea dvs. de înscriere pentru copilul <strong>${escapeHtml(data.childName)}</strong>. 
             Mai jos găsiți rezumatul detaliilor transmise:
           </div>
@@ -611,7 +611,7 @@ export async function sendInscriptionEmails(data: InscriptionPayload): Promise<{
 
     // 1. Staff notification (same HTML body to every recipient — full form data)
     const adminMailOptions = {
-      from: `"${safeParentName} via Poli Summer Camp" <${smtpFrom}>`,
+      from: `"${safeParentName} via Taberele Micilor Ingineri" <${smtpFrom}>`,
       to: adminRecipients,
       subject: `[Înscriere Nouă] ${safeChildName} - ${data.ageCategory} - ${data.series}`,
       html: getAdminEmailHtml(data),
@@ -620,9 +620,9 @@ export async function sendInscriptionEmails(data: InscriptionPayload): Promise<{
 
     // 2. Parent confirmation
     const parentMailOptions = {
-      from: `"Poli Summer Camp" <${smtpFrom}>`,
+      from: `"Taberele Micilor Ingineri" <${smtpFrom}>`,
       to: data.email,
-      subject: `Înscriere înregistrată - Poli Summer Camp (${safeChildName})`,
+      subject: `Înscriere înregistrată - Taberele Micilor Ingineri (${safeChildName})`,
       html: getParentConfirmationHtml(data),
     };
 

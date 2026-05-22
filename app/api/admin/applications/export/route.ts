@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   });
 
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Poli Summer Camp";
+  wb.creator = "Taberele Micilor Ingineri";
   const ws = wb.addWorksheet("Înscrieri", {
     views: [{ state: "frozen", ySplit: 1 }],
   });

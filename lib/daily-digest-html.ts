@@ -23,7 +23,7 @@ export function getDailyDigestEmailHtml(rows: Application[], dateLabel: string):
 <html><head><meta charset="utf-8"></head>
 <body style="font-family:Segoe UI,sans-serif;color:#122647;background:#f4f7fc;padding:20px;">
   <div style="max-width:900px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;border:1px solid #d7e0ef;">
-    <h1 style="color:#1e315f;">Poli Summer Camp — rezumat înscrieri</h1>
+    <h1 style="color:#1e315f;">Taberele Micilor Ingineri — rezumat înscrieri</h1>
     <p style="color:#536685;">Data raportului: <strong>${escapeHtml(dateLabel)}</strong></p>
     <p style="color:#536685;">Total înscrieri (în baza de date): <strong>${rows.length}</strong></p>
     <table style="border-collapse:collapse;width:100%;font-size:14px;margin-top:16px;">

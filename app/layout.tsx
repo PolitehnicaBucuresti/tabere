@@ -11,7 +11,7 @@ const geistSans = Geist({
 });
 
 const siteUrl = getSiteUrl();
-const siteName = "Poli Summer Camp";
+const siteName = "Taberele Micilor Ingineri";
 const title = {
   default: `${siteName} | Tabere copii UPB`,
   template: `%s | ${siteName}`,
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   title,
   description,
   keywords: [
-    "Poli Summer Camp",
+    "Taberele Micilor Ingineri",
     "tabără copii București",
     "tabără UPB",
     "POLITEHNICA București copii",
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
         url: "/8.close-up-smiley-kids-team.jpg",
         width: 1200,
         height: 630,
-        alt: "Copii la activități în cadrul Poli Summer Camp, campus POLITEHNICA București",
+        alt: "Copii la activități la Taberele Micilor Ingineri, campus POLITEHNICA București",
       },
     ],
   },

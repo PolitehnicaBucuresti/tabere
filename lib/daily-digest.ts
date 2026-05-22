@@ -57,13 +57,13 @@ export async function runDailyDigestJob(): Promise<{ ok: true; sent: number } | 
     const now = new Date();
     const dateLabel = now.toLocaleString("ro-RO", { timeZone: "Europe/Bucharest", dateStyle: "full" });
     const html = getDailyDigestEmailHtml(apps, dateLabel);
-    const subject = `[Poli Summer Camp] Rezumat zilnic înscrieri — ${now.toLocaleDateString("ro-RO", { timeZone: "Europe/Bucharest" })}`;
+    const subject = `[Taberele Micilor Ingineri] Rezumat zilnic înscrieri — ${now.toLocaleDateString("ro-RO", { timeZone: "Europe/Bucharest" })}`;
 
     const transporter = createSmtpTransporter();
 
     const toList = recipients.map((r) => r.email);
     await transporter.sendMail({
-      from: `"Poli Summer Camp" <${smtpFrom}>`,
+      from: `"Taberele Micilor Ingineri" <${smtpFrom}>`,
       to: smtpFrom,
       bcc: toList,
       subject,

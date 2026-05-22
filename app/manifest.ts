@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Poli Summer Camp — Tabere copii UPB",
-    short_name: "Poli Summer Camp",
+    name: "Taberele Micilor Ingineri — tabere copii UPB",
+    short_name: "Taberele Micilor Ingineri",
     description:
       "Tabere urbane POLITEHNICA București pentru copii între 5 și 11 ani: înscriere online și activități STEM.",
     start_url: "/",
