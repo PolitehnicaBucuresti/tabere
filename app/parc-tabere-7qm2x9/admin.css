@@ -134,6 +134,14 @@
   font-weight: 700;
 }
 
+.adminTable th.adminTableNr,
+.adminTable td.adminTableNr {
+  width: 2.75rem;
+  text-align: right;
+  color: #536685;
+  font-variant-numeric: tabular-nums;
+}
+
 .adminTableActions {
   display: flex;
   flex-wrap: wrap;

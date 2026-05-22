@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
+import { applicationsExportFilename, buildApplicationsExcelBuffer } from "@/lib/applications-export-xlsx";
 import { getDailyDigestEmailHtml } from "@/lib/daily-digest-html";
 
 function createSmtpTransporter() {
@@ -58,6 +59,8 @@ export async function runDailyDigestJob(): Promise<{ ok: true; sent: number } | 
     const dateLabel = now.toLocaleString("ro-RO", { timeZone: "Europe/Bucharest", dateStyle: "full" });
     const html = getDailyDigestEmailHtml(apps, dateLabel);
     const subject = `[Taberele Micilor Ingineri] Rezumat zilnic înscrieri — ${now.toLocaleDateString("ro-RO", { timeZone: "Europe/Bucharest" })}`;
+    const excelBuffer = await buildApplicationsExcelBuffer(apps);
+    const excelFilename = applicationsExportFilename(now);
 
     const transporter = createSmtpTransporter();
 
@@ -68,6 +71,13 @@ export async function runDailyDigestJob(): Promise<{ ok: true; sent: number } | 
       bcc: toList,
       subject,
       html,
+      attachments: [
+        {
+          filename: excelFilename,
+          content: excelBuffer,
+          contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        },
+      ],
     });
 
     console.log("[daily-digest] Sent to", toList.length, "address(es).");

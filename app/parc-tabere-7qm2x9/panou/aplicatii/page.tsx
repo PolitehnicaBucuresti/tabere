@@ -79,6 +79,7 @@ export default function AplicatiiListPage() {
           <table className="adminTable">
             <thead>
               <tr>
+                <th className="adminTableNr">Nr.</th>
                 <th>Dată</th>
                 <th>Copil</th>
                 <th>Părinte</th>
@@ -88,8 +89,9 @@ export default function AplicatiiListPage() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
+              {rows.map((r, i) => (
                 <tr key={r.id}>
+                  <td className="adminTableNr">{i + 1}</td>
                   <td>{new Date(r.createdAt).toLocaleString("ro-RO")}</td>
                   <td>{r.childName}</td>
                   <td>{r.parentName}</td>
@@ -107,6 +109,9 @@ export default function AplicatiiListPage() {
               ))}
             </tbody>
           </table>
+          <p className="adminMuted" style={{ marginTop: "0.75rem", marginBottom: 0 }}>
+            În total: <strong>{rows.length}</strong> înscrieri afișate în listă.
+          </p>
         </div>
       ) : null}
     </div>

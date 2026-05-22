@@ -42,7 +42,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - **Panou (URL discret):** `/parc-tabere-7qm2x9` — configurare în `lib/admin-config.ts` (`ADMIN_PATH_SEGMENT`); redenumirea necesită actualizare foldere `app/parc-tabere-7qm2x9` și `middleware.ts` matcher.
 - **Parolă implicită** (înlocuiește în producție cu `ADMIN_PASSWORD`): `UpbTabere#adm_k7n2`. `ADMIN_SESSION_SECRET` obligatoriu puternic în producție.
 - **Export:** Excel `.xlsx` din lista de înscrieri.
-- **Raport zilnic 09:00 (Europe/Bucharest):** destinatari în „Notificări zilnice”; cron în `instrumentation.ts`. Oprire: `DISABLE_DAILY_CRON=1`. Manual: `POST /api/admin/cron/daily` cu `Authorization: Bearer <CRON_SECRET>`.
+- **Raport zilnic 09:00 (Europe/Bucharest):** destinatari în „Notificări zilnice”; cron în `instrumentation.ts`. Oprire: `DISABLE_DAILY_CRON=1`. Manual (aceeași trimitere ca job-ul zilnic): `POST /api/admin/cron/daily` cu `Authorization: Bearer <CRON_SECRET>` **sau** din panou **Notificări zilnice → „Trimite raportul acum”** (`POST /api/admin/digest/send`, sesiune admin).
 
 Înscrierile publice sunt persistate înainte de e-mailuri (`/api/inscriere`).
 

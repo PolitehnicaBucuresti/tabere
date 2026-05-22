@@ -3,8 +3,8 @@ import type { NextRequest } from "next/server";
 import { runDailyDigestJob } from "@/lib/daily-digest";
 
 /**
- * Manual trigger for daily digest (e.g. cron on host: curl -H "Authorization: Bearer $CRON_SECRET").
- * Or call from admin "Send test" if we add later.
+ * Manual trigger for daily digest (cron on host: Bearer CRON_SECRET).
+ * Same send as panou „Trimite raportul acum”: POST /api/admin/digest/send (admin session).
  */
 export async function POST(request: NextRequest) {
   const secret = process.env.CRON_SECRET?.trim();
