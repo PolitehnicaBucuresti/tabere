@@ -11,6 +11,7 @@ export function getDailyDigestEmailHtml(rows: Application[], dateLabel: string):
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.createdAt.toISOString().slice(0, 10))}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.childName)}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.parentName)}</td>
+      <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(String(r.phone ?? ""))}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.email)}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.series)}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.ageCategory)}</td>
@@ -32,12 +33,13 @@ export function getDailyDigestEmailHtml(rows: Application[], dateLabel: string):
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Dată</th>
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Copil</th>
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Părinte</th>
+          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Telefon</th>
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">E-mail</th>
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Săptămână</th>
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Grupă</th>
         </tr>
       </thead>
-      <tbody>${rowsHtml || `<tr><td colspan="6" style="padding:12px;">Nu există înscrieri în baza de date.</td></tr>`}</tbody>
+      <tbody>${rowsHtml || `<tr><td colspan="7" style="padding:12px;">Nu există înscrieri în baza de date.</td></tr>`}</tbody>
     </table>
   </div>
 </body></html>`;
