@@ -2,46 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { inscriptionPayloadSchema } from "@/lib/inscription-schema";
 import { sendInscriptionEmails } from "@/lib/email";
 import { createApplicationIfSlotAvailable } from "@/lib/inscription-capacity";
-
-function getAllowedOrigins(): string[] | null {
-  const explicit = process.env.INSCRIPTION_ALLOWED_ORIGINS?.trim();
-  if (explicit) {
-    const list = explicit.split(",").map((s) => s.trim()).filter(Boolean);
-    return list.length ? list : null;
-  }
-
-  const site = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (!site) return null;
-
-  try {
-    return [new URL(site).origin];
-  } catch {
-    return null;
-  }
-}
-
-/** Local browser hits (next dev / next start on this machine) — avoid blocking when NEXT_PUBLIC_SITE_URL is the prod canonical URL. */
-function isLocalBrowserHost(request: NextRequest): boolean {
-  const raw = request.headers.get("host");
-  if (!raw) return false;
-  try {
-    const hostname = new URL(`http://${raw}`).hostname.toLowerCase();
-    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
-  } catch {
-    return false;
-  }
-}
+import { isStrictOriginAllowed } from "@/lib/inscriere-http-allow";
 
 function isOriginAllowed(request: NextRequest): boolean {
-  if (isLocalBrowserHost(request)) {
-    return true;
-  }
-
-  const allowed = getAllowedOrigins();
-  if (!allowed?.length) return true;
-
-  const origin = request.headers.get("origin");
-  return !!origin && allowed.includes(origin);
+  return isStrictOriginAllowed(request);
 }
 
 function honeypotTriggered(body: unknown): boolean {
