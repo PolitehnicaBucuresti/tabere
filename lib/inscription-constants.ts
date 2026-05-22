@@ -10,3 +10,6 @@ export type InscriptionSeries = (typeof INSCRIPTION_SERIES_OPTIONS)[number];
 export const INSCRIPTION_AGE_CATEGORIES = ["5-7 ani", "7-9 ani", "9-11 ani"] as const;
 
 export type InscriptionAgeCategory = (typeof INSCRIPTION_AGE_CATEGORIES)[number];
+
+/** Maxim copii înscrise per săptămână și categorie de vârstă. */
+export const INSCRIPTION_SLOT_CAPACITY_PER_GROUP = 25;

@@ -1035,6 +1035,81 @@ button[type="submit"]:disabled:hover {
   background: linear-gradient(120deg, #2b4f97, #3b65b8);
 }
 
+.ageTab:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none;
+  filter: none;
+}
+
+.ageTab:disabled:hover {
+  transform: none;
+  border-color: #cfe0ff;
+}
+
+.ageTabBadge {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+}
+
+.signupCapacityLoading,
+.signupCapacityBanner,
+.signupCapacityWarning,
+.signupCapacityFull {
+  margin: 0 0 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.signupCapacityLoading {
+  background: #f4f8ff;
+  color: var(--ink-soft);
+}
+
+.signupCapacityBanner {
+  background: #f8fbff;
+  color: var(--ink-soft);
+}
+
+.signupCapacityBannerSub {
+  display: inline;
+}
+
+.signupCapacityWarning {
+  background: rgba(255, 244, 220, 0.75);
+  border-color: rgba(212, 160, 20, 0.35);
+  color: var(--ink);
+}
+
+.signupCapacityFull {
+  background: rgba(254, 242, 242, 0.9);
+  border-color: rgba(220, 60, 60, 0.28);
+  color: #842029;
+}
+
+.radioLabel.radioLabelDisabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
+.slotCapacityHint {
+  margin-left: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.slotCapacityHintFull {
+  color: #9a351c;
+}
+
 .signupFormPanel {
   position: relative;
   border-radius: 14px;

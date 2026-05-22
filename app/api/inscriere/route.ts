@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { inscriptionPayloadSchema } from "@/lib/inscription-schema";
 import { sendInscriptionEmails } from "@/lib/email";
-import { prisma } from "@/lib/prisma";
+import { createApplicationIfSlotAvailable } from "@/lib/inscription-capacity";
 
 function getAllowedOrigins(): string[] | null {
   const explicit = process.env.INSCRIPTION_ALLOWED_ORIGINS?.trim();
@@ -81,23 +81,20 @@ export async function POST(request: NextRequest) {
   }
 
   const d = parsed.data;
+
   try {
-    await prisma.application.create({
-      data: {
-        parentName: d.parentName,
-        phone: d.phone,
-        email: d.email,
-        childName: d.childName,
-        age: d.age,
-        school: d.school,
-        series: d.series,
-        ageCategory: d.ageCategory,
-        medicalInfo: d.medicalInfo,
-        childPassions: d.childPassions,
-        organizerNotes: d.organizerNotes,
-        gdprAccepted: true,
-      },
-    });
+    const saved = await createApplicationIfSlotAvailable(d);
+    if (!saved.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "Nu mai sunt locuri disponibile pentru această săptămână și grupă de vârstă. Alegeți alta sau contactați organizatorii.",
+          code: "SLOT_FULL",
+        },
+        { status: 409 },
+      );
+    }
   } catch (e) {
     console.error("[inscriere] DB:", e);
     return NextResponse.json(

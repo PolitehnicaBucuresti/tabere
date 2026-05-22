@@ -1,11 +1,17 @@
  "use client";
 
 import Image from "next/image";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { type InscriptionAgeCategory, INSCRIPTION_AGE_CATEGORIES, INSCRIPTION_SERIES_OPTIONS } from "@/lib/inscription-constants";
 import { inscriptionPayloadSchema, type InscriptionPayload } from "@/lib/inscription-schema";
+import {
+  ageCategoryFullyBooked,
+  allProgramSlotsFull,
+  isSeriesAgeFull,
+  type SlotCountMap,
+} from "@/lib/inscription-slot-helpers";
 import {
   CalendarDays,
   Clock3,
@@ -98,6 +104,56 @@ export default function Home() {
   const feedbackRef = useRef<HTMLParagraphElement>(null);
   const currentYear = new Date().getFullYear();
 
+  const [capacityPayload, setCapacityPayload] = useState<{ limit: number; slots: SlotCountMap } | null>(null);
+  const [capacityLoading, setCapacityLoading] = useState(true);
+  const [capacityFetchError, setCapacityFetchError] = useState<string | null>(null);
+
+  const loadCapacity = useCallback(async () => {
+    setCapacityLoading(true);
+    setCapacityFetchError(null);
+    try {
+      const res = await fetch("/api/inscriere/capacity", { headers: { Accept: "application/json" } });
+      if (!res.ok) {
+        setCapacityFetchError("Nu am putut verifica locurile libere. Poți reîncărca pagina.");
+        setCapacityPayload(null);
+        return;
+      }
+      const data = (await res.json()) as { limit?: number; slots?: SlotCountMap };
+      if (typeof data.limit !== "number" || !data.slots) {
+        setCapacityFetchError("Răspuns invalid de la server.");
+        setCapacityPayload(null);
+        return;
+      }
+      setCapacityPayload({ limit: data.limit, slots: data.slots });
+    } catch {
+      setCapacityFetchError("Eroare de rețea la verificarea locurilor.");
+      setCapacityPayload(null);
+    } finally {
+      setCapacityLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadCapacity();
+  }, [loadCapacity]);
+
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === "visible") void loadCapacity();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [loadCapacity]);
+
+  useEffect(() => {
+    if (!capacityPayload) return;
+    setSelectedAgeCategory((prev) =>
+      ageCategoryFullyBooked(capacityPayload.slots, prev)
+        ? (INSCRIPTION_AGE_CATEGORIES.find((c) => !ageCategoryFullyBooked(capacityPayload.slots, c)) ?? prev)
+        : prev,
+    );
+  }, [capacityPayload]);
+
   useEffect(() => {
     if (formStatus !== "success") return;
     const id = requestAnimationFrame(() => {
@@ -178,6 +234,24 @@ export default function Home() {
       return;
     }
 
+    const slotsSnap = capacityPayload?.slots ?? null;
+    if (
+      slotsSnap &&
+      isSeriesAgeFull(slotsSnap, validated.data.series, validated.data.ageCategory)
+    ) {
+      setFormStatus("idle");
+      setFieldErrors({
+        series: "Această săptămână nu mai are locuri pentru grupa de vârstă aleasă. Alege altă săptămână.",
+      });
+      toast.warning("Această combinație este deja completă.", {
+        description: "Selectează o altă săptămână sau schimbă grupa de vârstă.",
+      });
+      requestAnimationFrame(() => {
+        document.getElementById("inscription-series-fieldset")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      return;
+    }
+
     setFormStatus("submitting");
 
     const controller = new AbortController();
@@ -191,16 +265,28 @@ export default function Home() {
         signal: controller.signal,
       });
 
-      let data: { ok?: boolean; error?: string; details?: string } = {};
+      let data: { ok?: boolean; error?: string; details?: string; code?: string } = {};
       try {
-        data = (await res.json()) as { ok?: boolean; error?: string; details?: string };
+        data = (await res.json()) as {
+          ok?: boolean;
+          error?: string;
+          details?: string;
+          code?: string;
+        };
       } catch {
         data = {};
       }
 
       if (!res.ok || !data.ok) {
         setFormStatus("error");
-        const msg = data.error ?? "A apărut o problemă la trimitere. Încearcă din nou.";
+        if (res.status === 409 || data.code === "SLOT_FULL") {
+          void loadCapacity();
+        }
+        const msg =
+          data.error ??
+          (res.status === 409
+            ? "Nu mai sunt locuri pentru combinația aleasă. Alege altă săptămână sau altă grupă de vârstă."
+            : "A apărut o problemă la trimitere. Încearcă din nou.");
         setFormError(msg);
         setSmtpDiag(typeof data.details === "string" ? data.details : null);
         toast.error(msg, data.details ? { description: data.details } : undefined);
@@ -212,7 +298,14 @@ export default function Home() {
       setSmtpDiag(null);
       setFormStatus("success");
       formEl.reset();
-      setSelectedAgeCategory(INSCRIPTION_AGE_CATEGORIES[0]);
+      const avail =
+        capacityPayload?.slots != null
+          ? (INSCRIPTION_AGE_CATEGORIES.find(
+              (c) => !ageCategoryFullyBooked(capacityPayload.slots, c),
+            ) ?? INSCRIPTION_AGE_CATEGORIES[0])
+          : INSCRIPTION_AGE_CATEGORIES[0];
+      setSelectedAgeCategory(avail);
+      void loadCapacity();
     } catch (err) {
       setFormStatus("error");
       if (err instanceof DOMException && err.name === "AbortError") {
@@ -243,6 +336,20 @@ export default function Home() {
       return next;
     });
   }
+
+  const inscriptionSlots = capacityPayload?.slots ?? null;
+  const chosenAgeHasNoWeeks =
+    !!inscriptionSlots &&
+    INSCRIPTION_SERIES_OPTIONS.every((s) =>
+      isSeriesAgeFull(inscriptionSlots, s, selectedAgeCategory),
+    );
+  const inscriptionSubmitDisabled =
+    formStatus === "submitting" ||
+    capacityLoading ||
+    (!capacityFetchError &&
+      inscriptionSlots !== null &&
+      allProgramSlotsFull(inscriptionSlots)) ||
+    (!capacityFetchError && chosenAgeHasNoWeeks);
 
   return (
     <div className="siteWrap">
@@ -444,6 +551,39 @@ export default function Home() {
           </div>
           <div className="signupLayout">
             <div className="signupFormPanel">
+              {capacityFetchError ? (
+                <p className="signupCapacityWarning" role="status">
+                  {capacityFetchError} Locurile sunt totuși validate la trimiterea cererii pe server.
+                </p>
+              ) : null}
+              {!capacityFetchError && capacityLoading ? (
+                <p className="signupCapacityLoading" role="status">
+                  Verificăm disponibilitatea locurilor…
+                </p>
+              ) : null}
+              {!capacityFetchError && capacityPayload ? (
+                <p className="signupCapacityBanner">
+                  Fiecare grupă de vârstă: până la <strong>{capacityPayload.limit}</strong> copii înscriși / săptămână{" "}
+                  <span className="signupCapacityBannerSub">
+                    (max. {capacityPayload.limit * INSCRIPTION_AGE_CATEGORIES.length} copii / săptămână pentru toate grupele).
+                  </span>
+                </p>
+              ) : null}
+              {!capacityFetchError && capacityPayload && allProgramSlotsFull(capacityPayload.slots) ? (
+                <p className="signupCapacityFull" role="alert">
+                  Momentan nu mai sunt locuri disponibile pentru nicio săptămână. Te rugăm să revii mai târziu sau să
+                  contactezi organizatorii.
+                </p>
+              ) : null}
+              {!capacityFetchError &&
+              capacityPayload &&
+              !allProgramSlotsFull(capacityPayload.slots) &&
+              chosenAgeHasNoWeeks ? (
+                <p className="signupCapacityWarning" role="status">
+                  Pentru această grupă de vârstă nu mai sunt locuri în nicio săptămână. Alege-o pe cealaltă.
+                </p>
+              ) : null}
+
               <form
                 className="signupForm"
                 noValidate
@@ -494,26 +634,44 @@ export default function Home() {
                   role="tablist"
                   aria-label="Categorie de vârstă pentru înscriere"
                 >
-                  {INSCRIPTION_AGE_CATEGORIES.map((category) => (
-                    <button
-                      key={category}
-                      type="button"
-                      role="tab"
-                      className={`ageTab ${selectedAgeCategory === category ? "isActive" : ""}`}
-                      aria-selected={selectedAgeCategory === category}
-                      onClick={() => {
-                        setSelectedAgeCategory(category);
-                        setFieldErrors((prev) => {
-                          if (!prev.ageCategory) return prev;
-                          const next = { ...prev };
-                          delete next.ageCategory;
-                          return next;
-                        });
-                      }}
-                    >
-                      {category}
-                    </button>
-                  ))}
+                  {INSCRIPTION_AGE_CATEGORIES.map((category) => {
+                    const booked =
+                      !capacityLoading &&
+                      inscriptionSlots !== null &&
+                      ageCategoryFullyBooked(inscriptionSlots, category);
+                    return (
+                      <button
+                        key={category}
+                        type="button"
+                        role="tab"
+                        className={`ageTab ${selectedAgeCategory === category ? "isActive" : ""}`}
+                        aria-selected={selectedAgeCategory === category}
+                        disabled={booked}
+                        title={
+                          booked
+                            ? "Toate săptămânile sunt complete pentru această grupă de vârstă."
+                            : undefined
+                        }
+                        onClick={() => {
+                          setSelectedAgeCategory(category);
+                          setFieldErrors((prev) => {
+                            if (!prev.ageCategory) return prev;
+                            const next = { ...prev };
+                            delete next.ageCategory;
+                            return next;
+                          });
+                        }}
+                      >
+                        {category}
+                        {booked ? (
+                          <span className="ageTabBadge" aria-hidden="true">
+                            {" "}
+                            complet
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
                 </div>
                 <FieldError message={fieldErrors.ageCategory} />
                 <input type="hidden" name="ageCategory" value={selectedAgeCategory} />
@@ -601,17 +759,31 @@ export default function Home() {
                 </fieldset>
 
                 <fieldset
+                  key={selectedAgeCategory}
                   id="inscription-series-fieldset"
                   className={fieldErrors.series ? "fieldsetHasError" : undefined}
                   aria-required="true"
                 >
                   <legend>Alegerea programului</legend>
-                  {INSCRIPTION_SERIES_OPTIONS.map((option) => (
-                    <label key={option} className="checkboxLabel radioLabel">
-                      <input type="radio" name="series" value={option} />
-                      {option}
-                    </label>
-                  ))}
+                  {INSCRIPTION_SERIES_OPTIONS.map((option) => {
+                    const slot = inscriptionSlots?.[option]?.[selectedAgeCategory];
+                    const full = !!slot?.full;
+                    const remaining = slot?.remaining;
+                    return (
+                      <label
+                        key={option}
+                        className={`checkboxLabel radioLabel ${full ? "radioLabelDisabled" : ""}`}
+                      >
+                        <input type="radio" name="series" value={option} disabled={full} />
+                        <span>{option}</span>
+                        {!capacityFetchError && slot ? (
+                          <span className={full ? "slotCapacityHint slotCapacityHintFull" : "slotCapacityHint"}>
+                            {full ? ` (${slot.count}/${capacityPayload?.limit ?? "—"}, complet)` : ` — ${remaining} locuri`}
+                          </span>
+                        ) : null}
+                      </label>
+                    );
+                  })}
                   <FieldError message={fieldErrors.series} />
                 </fieldset>
 
@@ -671,7 +843,11 @@ export default function Home() {
                   <FieldError message={fieldErrors.gdpr} />
                 </div>
 
-                <button type="submit" disabled={formStatus === "submitting"} aria-busy={formStatus === "submitting"}>
+                <button
+                  type="submit"
+                  disabled={inscriptionSubmitDisabled}
+                  aria-busy={formStatus === "submitting"}
+                >
                   Înscrie copilul
                 </button>
               </form>

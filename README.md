@@ -43,9 +43,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - **Parolă implicită** (înlocuiește în producție cu `ADMIN_PASSWORD`): `UpbTabere#adm_k7n2`. `ADMIN_SESSION_SECRET` obligatoriu puternic în producție.
 - **Export:** Excel `.xlsx` din lista de înscrieri.
 - **Raport zilnic 09:00 (Europe/Bucharest):** destinatari în „Notificări zilnice”; cron în `instrumentation.ts`. Oprire: `DISABLE_DAILY_CRON=1`. Manual (aceeași trimitere ca job-ul zilnic): `POST /api/admin/cron/daily` cu `Authorization: Bearer <CRON_SECRET>` **sau** din panou **Notificări zilnice → „Trimite raportul acum”** (`POST /api/admin/digest/send`, sesiune admin).
-
-Înscrierile publice sunt persistate înainte de e-mailuri (`/api/inscriere`).
-
+- **Înscriere publică** (`POST /api/inscriere`): înscrierea e salvată înainte de trimiterea e-mailurilor. Limită: pentru fiecare **săptămână** × **grupă de vârstă** există cel mult **25** locuri (**75 / săptămână** total). Disponibilitatea se citește în pagină prin **`GET /api/inscriere/capacity`**; salvarea folosește tranzacții **SERIALIZABLE** pentru a evita supraîncrezarea la trimiteri simultane.
 ## Deploy automat (GitHub Actions)
 
 Vezi [docs/GITHUB_ACTIONS.md](docs/GITHUB_ACTIONS.md): deploy SSH din cloud SAU **runner self-hosted pe VM** (necesar dacă VM-ul e accesibil doar prin VPN).
