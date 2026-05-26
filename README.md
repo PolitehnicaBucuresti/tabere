@@ -38,12 +38,14 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## Database & panou admin
 
 - **PostgreSQL** via Docker Compose (`db` service). Set `DB_PASSWORD` in `.env`; `DATABASE_URL` este setat în `docker-compose` pentru serviciul `web`.
+- **Limite resurse containere** (CPU/RAM): definite în `docker-compose.yml` pentru `db` și `web`. Suprascrie în `.env` dacă ai nevoie: `DB_CONTAINER_CPUS`, `DB_CONTAINER_MEMORY`, `DB_CONTAINER_MEMORY_RESERVED`, `WEB_CONTAINER_CPUS`, `WEB_CONTAINER_MEMORY`, `WEB_CONTAINER_MEMORY_RESERVED`.
 - **Migrations:** `npx prisma migrate deploy` (rulează automat în Docker înainte de `npm start`).
 - **Panou (URL discret):** `/parc-tabere-7qm2x9` — configurare în `lib/admin-config.ts` (`ADMIN_PATH_SEGMENT`); redenumirea necesită actualizare foldere `app/parc-tabere-7qm2x9` și `middleware.ts` matcher.
 - **Parolă implicită** (înlocuiește în producție cu `ADMIN_PASSWORD`): `UpbTabere#adm_k7n2`. `ADMIN_SESSION_SECRET` obligatoriu puternic în producție.
 - **Export:** Excel `.xlsx` din lista de înscrieri.
 - **Raport zilnic 09:00 (Europe/Bucharest):** destinatari în „Notificări zilnice”; cron în `instrumentation.ts`. Oprire: `DISABLE_DAILY_CRON=1`. Manual (aceeași trimitere ca job-ul zilnic): `POST /api/admin/cron/daily` cu `Authorization: Bearer <CRON_SECRET>` **sau** din panou **Notificări zilnice → „Trimite raportul acum”** (`POST /api/admin/digest/send`, sesiune admin).
 - **Înscriere publică** (`POST /api/inscriere`): înscrierea e salvată înainte de trimiterea e-mailurilor. Limită: pentru fiecare **săptămână** × **grupă de vârstă** există cel mult **25** locuri (**75 / săptămână** total). Disponibilitatea se citește în pagină prin **`GET /api/inscriere/capacity`**; salvarea folosește tranzacții **SERIALIZABLE** pentru a evita supraîncrezarea la trimiteri simultane.
+
 ## Deploy automat (GitHub Actions)
 
 Vezi [docs/GITHUB_ACTIONS.md](docs/GITHUB_ACTIONS.md): deploy SSH din cloud SAU **runner self-hosted pe VM** (necesar dacă VM-ul e accesibil doar prin VPN).

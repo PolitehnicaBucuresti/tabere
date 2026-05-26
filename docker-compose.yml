@@ -19,6 +19,10 @@ services:
     # Dacă ai Postgres local pe 5432, folosește 127.0.0.1:5433:5432 și port 5433 în DATABASE_URL.
     ports:
       - "127.0.0.1:5432:5432"
+    # Limite container (standalone docker compose — vezi README)
+    cpus: "${DB_CONTAINER_CPUS:-0.50}"
+    mem_limit: ${DB_CONTAINER_MEMORY:-512m}
+    mem_reservation: ${DB_CONTAINER_MEMORY_RESERVED:-128m}
 
   web:
     build: .
@@ -43,6 +47,11 @@ services:
       - traefik.http.routers.psc-tabere.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-letsencrypt}
       - traefik.http.routers.psc-tabere.service=psc-tabere-svc
       - traefik.http.services.psc-tabere-svc.loadbalancer.server.port=3000
+    # Limite container (Next.js + Node); ajustezi după RAM/CPU disponibile pe VM
+    cpus: "${WEB_CONTAINER_CPUS:-1.0}"
+    mem_limit: ${WEB_CONTAINER_MEMORY:-1024m}
+    mem_reservation: ${WEB_CONTAINER_MEMORY_RESERVED:-256m}
+    pids_limit: 512
 
 networks:
   internal:
