@@ -52,6 +52,8 @@ export const inscriptionPayloadSchema = z.object({
         "Completați mesajul pentru organizatori sau scrieți „Nu am informații suplimentare.” dacă nu este cazul.",
     })
     .max(4000),
+  /** Opțional; validarea efectivă o fac organizatorii. */
+  discountCode: z.string().trim().max(120, { message: "Cod de reducere prea lung (max. 120 caractere)." }),
   gdpr: z.literal(true, { message: "Este necesar consimțământul pentru prelucrarea datelor personale." }),
   ageCategory: z.enum(INSCRIPTION_AGE_CATEGORIES, { message: "Selectați categoria de vârstă (tab)." }),
 });

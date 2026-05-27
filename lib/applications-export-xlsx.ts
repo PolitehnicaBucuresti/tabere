@@ -23,6 +23,7 @@ export async function buildApplicationsExcelBuffer(apps: Application[]): Promise
     "Alergii / medical",
     "Pasiuni",
     "Mesaj organizatori",
+    "Cod reducere",
     "GDPR",
   ] as const;
 
@@ -44,6 +45,7 @@ export async function buildApplicationsExcelBuffer(apps: Application[]): Promise
       r.medicalInfo,
       r.childPassions,
       r.organizerNotes,
+      r.discountCode || "",
       r.gdprAccepted ? "Da" : "Nu",
     ]);
   }

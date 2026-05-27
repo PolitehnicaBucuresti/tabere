@@ -18,6 +18,7 @@ const patchSchema = z
     medicalInfo: z.string().trim().min(1).max(4000).optional(),
     childPassions: z.string().trim().min(1).max(4000).optional(),
     organizerNotes: z.string().trim().min(1).max(4000).optional(),
+    discountCode: z.string().trim().max(120).optional(),
     gdprAccepted: z.boolean().optional(),
   })
   .strict();

@@ -40,6 +40,7 @@ const INSCRIPTION_FIELD_SCROLL_ORDER: InscriptionFieldKey[] = [
   "medicalInfo",
   "childPassions",
   "organizerNotes",
+  "discountCode",
   "gdpr",
 ];
 
@@ -219,6 +220,7 @@ export default function Home() {
       medicalInfo: String(fd.get("medicalInfo") ?? "").trim(),
       childPassions: String(fd.get("childPassions") ?? "").trim(),
       organizerNotes: String(fd.get("organizerNotes") ?? "").trim(),
+      discountCode: String(fd.get("discountCode") ?? "").trim(),
       gdpr: gdprAccepted,
       ageCategory:
         (String(fd.get("ageCategory") ?? "").trim() || selectedAgeCategory) as InscriptionPayload["ageCategory"],
@@ -827,6 +829,21 @@ export default function Home() {
                       className={fieldErrors.organizerNotes ? "inputInvalid" : undefined}
                     />
                     <FieldError message={fieldErrors.organizerNotes} />
+                  </label>
+                  <label className="signupFieldLabel">
+                    <span className="signupFieldLabelText">
+                      Cod de reducere (opțional)
+                    </span>
+                    <input
+                      type="text"
+                      name="discountCode"
+                      autoComplete="off"
+                      placeholder="Lasă gol dacă nu ai cod"
+                      maxLength={120}
+                      aria-invalid={!!fieldErrors.discountCode}
+                      className={fieldErrors.discountCode ? "inputInvalid" : undefined}
+                    />
+                    <FieldError message={fieldErrors.discountCode} />
                   </label>
                 </fieldset>
 

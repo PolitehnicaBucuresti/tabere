@@ -33,6 +33,7 @@ type FormState = {
   medicalInfo: string;
   childPassions: string;
   organizerNotes: string;
+  discountCode: string;
   gdpr: boolean;
 };
 
@@ -48,6 +49,7 @@ const empty: FormState = {
   medicalInfo: "",
   childPassions: "",
   organizerNotes: "",
+  discountCode: "",
   gdpr: false,
 };
 
@@ -78,6 +80,7 @@ export function AdminApplicationForm({ mode, applicationId, onSuccess }: Props) 
           medicalInfo: String(d.medicalInfo ?? ""),
           childPassions: String(d.childPassions ?? ""),
           organizerNotes: String(d.organizerNotes ?? ""),
+          discountCode: String(d.discountCode ?? ""),
           gdpr: Boolean(d.gdprAccepted),
         });
       } catch (e) {
@@ -118,6 +121,7 @@ export function AdminApplicationForm({ mode, applicationId, onSuccess }: Props) 
             medicalInfo: values.medicalInfo,
             childPassions: values.childPassions,
             organizerNotes: values.organizerNotes,
+            discountCode: values.discountCode,
             gdpr: true,
           }),
         });
@@ -146,6 +150,7 @@ export function AdminApplicationForm({ mode, applicationId, onSuccess }: Props) 
           medicalInfo: values.medicalInfo,
           childPassions: values.childPassions,
           organizerNotes: values.organizerNotes,
+          discountCode: values.discountCode,
           gdprAccepted: values.gdpr,
         }),
       });
@@ -270,6 +275,15 @@ export function AdminApplicationForm({ mode, applicationId, onSuccess }: Props) 
           rows={4}
           value={values.organizerNotes}
           onChange={(ev) => setValues((s) => ({ ...s, organizerNotes: ev.target.value }))}
+        />
+      </label>
+      <label className="adminField">
+        <span>Cod de reducere</span>
+        <input
+          type="text"
+          maxLength={120}
+          value={values.discountCode}
+          onChange={(ev) => setValues((s) => ({ ...s, discountCode: ev.target.value }))}
         />
       </label>
 

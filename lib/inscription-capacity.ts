@@ -80,6 +80,7 @@ export async function createApplicationIfSlotAvailable(
               medicalInfo: d.medicalInfo,
               childPassions: d.childPassions,
               organizerNotes: d.organizerNotes,
+              discountCode: d.discountCode,
               gdprAccepted: true,
             },
           });

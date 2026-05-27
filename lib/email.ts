@@ -265,6 +265,14 @@ function getAdminEmailHtml(data: InscriptionPayload): string {
             ${htmlMultiline(data.organizerNotes)}
           </div>
 
+          <div class="section-title">Cod de reducere</div>
+          <table>
+            <tr>
+              <th>Cod declarat</th>
+              <td>${data.discountCode.trim() !== "" ? escapeHtml(data.discountCode) : "—"}</td>
+            </tr>
+          </table>
+
           <div class="section-title">Acorduri</div>
           <table>
             <tr>
@@ -496,6 +504,10 @@ function getParentConfirmationHtml(data: InscriptionPayload): string {
             <div class="details-row">
               <span class="details-label">Săptămâna aleasă:</span>
               <span class="details-value">${escapeHtml(data.series)}</span>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Cod de reducere:</span>
+              <span class="details-value">${data.discountCode.trim() !== "" ? escapeHtml(data.discountCode) : "—"}</span>
             </div>
             <div class="details-row">
               <span class="details-label">Școala copilului:</span>

@@ -22,6 +22,7 @@ model Application {
   medicalInfo     String   @db.Text
   childPassions   String   @db.Text
   organizerNotes  String   @db.Text
+  discountCode    String   @default("") @db.VarChar(120)
   gdprAccepted    Boolean
 }
 

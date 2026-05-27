@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
       medicalInfo: d.medicalInfo,
       childPassions: d.childPassions,
       organizerNotes: d.organizerNotes,
+      discountCode: d.discountCode,
       gdprAccepted: true,
     },
   });
