@@ -1006,6 +1006,38 @@ button[type="submit"]:disabled:hover {
   box-shadow: 0 10px 18px rgba(25, 48, 102, 0.24);
 }
 
+.signupFormIntro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+}
+
+.signupFormIntro .signupCapacityBanner,
+.signupFormIntro .signupFormPriceNote {
+  margin: 0;
+}
+
+.signupFormPriceNote {
+  padding: 0.75rem 0.95rem;
+  border-radius: 12px;
+  border: 1px solid #cfe0ff;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.signupFormPriceNote strong {
+  color: #1e315f;
+  font-weight: 800;
+}
+
+.signupFormPriceNoteDetail {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
 .ageTabs {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1056,24 +1088,12 @@ button[type="submit"]:disabled:hover {
   color: var(--ink-soft);
 }
 
-.signupCapacityLoading,
-.signupCapacityBanner,
-.signupCapacityWarning,
-.signupCapacityFull {
-  margin: 0 0 0.85rem;
+.signupCapacityBanner {
   padding: 0.65rem 0.85rem;
   border-radius: 12px;
   border: 1px solid var(--line);
   font-size: 0.95rem;
   line-height: 1.5;
-}
-
-.signupCapacityLoading {
-  background: #f4f8ff;
-  color: var(--ink-soft);
-}
-
-.signupCapacityBanner {
   background: #f8fbff;
   color: var(--ink-soft);
 }
@@ -1082,32 +1102,9 @@ button[type="submit"]:disabled:hover {
   display: inline;
 }
 
-.signupCapacityWarning {
-  background: rgba(255, 244, 220, 0.75);
-  border-color: rgba(212, 160, 20, 0.35);
-  color: var(--ink);
-}
-
-.signupCapacityFull {
-  background: rgba(254, 242, 242, 0.9);
-  border-color: rgba(220, 60, 60, 0.28);
-  color: #842029;
-}
-
 .radioLabel.radioLabelDisabled {
   opacity: 0.62;
   cursor: not-allowed;
-}
-
-.slotCapacityHint {
-  margin-left: 0.25rem;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-  font-weight: 600;
-}
-
-.slotCapacityHintFull {
-  color: #9a351c;
 }
 
 .signupFormPanel {

@@ -13,3 +13,9 @@ export type InscriptionAgeCategory = (typeof INSCRIPTION_AGE_CATEGORIES)[number]
 
 /** Maxim copii înscrise per săptămână și categorie de vârstă. */
 export const INSCRIPTION_SLOT_CAPACITY_PER_GROUP = 25;
+
+/** Tarif afișat în formular și secțiunea „Program și tarife”. */
+export const INSCRIPTION_WEEKLY_PRICE_AMOUNT = "1 100 RON";
+export const INSCRIPTION_WEEKLY_PRICE_PERIOD = "/ copil / săptămână";
+export const INSCRIPTION_WEEKLY_PRICE_DISPLAY = `${INSCRIPTION_WEEKLY_PRICE_AMOUNT} ${INSCRIPTION_WEEKLY_PRICE_PERIOD}`;
+export const INSCRIPTION_SIBLING_DISCOUNT_LABEL = "Discount frați: 20%";

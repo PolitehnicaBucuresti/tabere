@@ -4,7 +4,15 @@ import Image from "next/image";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { type InscriptionAgeCategory, INSCRIPTION_AGE_CATEGORIES, INSCRIPTION_SERIES_OPTIONS } from "@/lib/inscription-constants";
+import {
+  type InscriptionAgeCategory,
+  INSCRIPTION_AGE_CATEGORIES,
+  INSCRIPTION_SERIES_OPTIONS,
+  INSCRIPTION_SLOT_CAPACITY_PER_GROUP,
+  INSCRIPTION_SIBLING_DISCOUNT_LABEL,
+  INSCRIPTION_WEEKLY_PRICE_AMOUNT,
+  INSCRIPTION_WEEKLY_PRICE_PERIOD,
+} from "@/lib/inscription-constants";
 import { inscriptionPayloadSchema, type InscriptionPayload } from "@/lib/inscription-schema";
 import {
   ageCategoryFullyBooked,
@@ -107,27 +115,22 @@ export default function Home() {
 
   const [capacityPayload, setCapacityPayload] = useState<{ limit: number; slots: SlotCountMap } | null>(null);
   const [capacityLoading, setCapacityLoading] = useState(true);
-  const [capacityFetchError, setCapacityFetchError] = useState<string | null>(null);
 
   const loadCapacity = useCallback(async () => {
     setCapacityLoading(true);
-    setCapacityFetchError(null);
     try {
       const res = await fetch("/api/inscriere/capacity", { headers: { Accept: "application/json" } });
       if (!res.ok) {
-        setCapacityFetchError("Nu am putut verifica locurile libere. Poți reîncărca pagina.");
         setCapacityPayload(null);
         return;
       }
       const data = (await res.json()) as { limit?: number; slots?: SlotCountMap };
       if (typeof data.limit !== "number" || !data.slots) {
-        setCapacityFetchError("Răspuns invalid de la server.");
         setCapacityPayload(null);
         return;
       }
       setCapacityPayload({ limit: data.limit, slots: data.slots });
     } catch {
-      setCapacityFetchError("Eroare de rețea la verificarea locurilor.");
       setCapacityPayload(null);
     } finally {
       setCapacityLoading(false);
@@ -347,11 +350,8 @@ export default function Home() {
     );
   const inscriptionSubmitDisabled =
     formStatus === "submitting" ||
-    capacityLoading ||
-    (!capacityFetchError &&
-      inscriptionSlots !== null &&
-      allProgramSlotsFull(inscriptionSlots)) ||
-    (!capacityFetchError && chosenAgeHasNoWeeks);
+    (inscriptionSlots !== null && allProgramSlotsFull(inscriptionSlots)) ||
+    chosenAgeHasNoWeeks;
 
   return (
     <div className="siteWrap">
@@ -512,14 +512,14 @@ export default function Home() {
           <article className="tariffsCard" aria-labelledby="tarife-heading">
             <h3 id="tarife-heading">Tarife</h3>
             <p className="tariffsPrice">
-              <strong>1 100 RON</strong> / copil / săptămână
+              <strong>{INSCRIPTION_WEEKLY_PRICE_AMOUNT}</strong> {INSCRIPTION_WEEKLY_PRICE_PERIOD}
             </p>
             <p>
               Tariful include: <strong>hrană</strong>, <strong>apă</strong>,{" "}
               <strong>materiale/rechizite</strong>, <strong>asistență medicală</strong>.
             </p>
             <p className="tariffsDiscount">
-              <strong>Discount frați: 20%</strong>
+              <strong>{INSCRIPTION_SIBLING_DISCOUNT_LABEL}</strong>
             </p>
           </article>
           <div className="accordionGrid">
@@ -553,38 +553,24 @@ export default function Home() {
           </div>
           <div className="signupLayout">
             <div className="signupFormPanel">
-              {capacityFetchError ? (
-                <p className="signupCapacityWarning" role="status">
-                  {capacityFetchError} Locurile sunt totuși validate la trimiterea cererii pe server.
-                </p>
-              ) : null}
-              {!capacityFetchError && capacityLoading ? (
-                <p className="signupCapacityLoading" role="status">
-                  Verificăm disponibilitatea locurilor…
-                </p>
-              ) : null}
-              {!capacityFetchError && capacityPayload ? (
+              <div className="signupFormIntro">
                 <p className="signupCapacityBanner">
-                  Fiecare grupă de vârstă: până la <strong>{capacityPayload.limit}</strong> copii înscriși / săptămână{" "}
+                  Fiecare grupă de vârstă: până la{" "}
+                  <strong>{INSCRIPTION_SLOT_CAPACITY_PER_GROUP}</strong> copii / săptămână{" "}
                   <span className="signupCapacityBannerSub">
-                    (max. {capacityPayload.limit * INSCRIPTION_AGE_CATEGORIES.length} copii / săptămână pentru toate grupele).
+                    (max. {INSCRIPTION_SLOT_CAPACITY_PER_GROUP * INSCRIPTION_AGE_CATEGORIES.length} copii / săptămână
+                    pentru toate grupele).
                   </span>
                 </p>
-              ) : null}
-              {!capacityFetchError && capacityPayload && allProgramSlotsFull(capacityPayload.slots) ? (
-                <p className="signupCapacityFull" role="alert">
-                  Momentan nu mai sunt locuri disponibile pentru nicio săptămână. Te rugăm să revii mai târziu sau să
-                  contactezi organizatorii.
+                <p className="signupFormPriceNote" role="note">
+                  Tarif tabără: <strong>{INSCRIPTION_WEEKLY_PRICE_AMOUNT}</strong> {INSCRIPTION_WEEKLY_PRICE_PERIOD}
+                  <span className="signupFormPriceNoteDetail">
+                    {" "}
+                    (include hrană, apă, materiale și asistență medicală;{" "}
+                    {INSCRIPTION_SIBLING_DISCOUNT_LABEL.toLowerCase()}).
+                  </span>
                 </p>
-              ) : null}
-              {!capacityFetchError &&
-              capacityPayload &&
-              !allProgramSlotsFull(capacityPayload.slots) &&
-              chosenAgeHasNoWeeks ? (
-                <p className="signupCapacityWarning" role="status">
-                  Pentru această grupă de vârstă nu mai sunt locuri în nicio săptămână. Alege-o pe cealaltă.
-                </p>
-              ) : null}
+              </div>
 
               <form
                 className="signupForm"
@@ -768,21 +754,16 @@ export default function Home() {
                 >
                   <legend>Alegerea programului</legend>
                   {INSCRIPTION_SERIES_OPTIONS.map((option) => {
-                    const slot = inscriptionSlots?.[option]?.[selectedAgeCategory];
-                    const full = !!slot?.full;
-                    const remaining = slot?.remaining;
+                    const full =
+                      !!inscriptionSlots &&
+                      isSeriesAgeFull(inscriptionSlots, option, selectedAgeCategory);
                     return (
                       <label
                         key={option}
                         className={`checkboxLabel radioLabel ${full ? "radioLabelDisabled" : ""}`}
                       >
                         <input type="radio" name="series" value={option} disabled={full} />
-                        <span>{option}</span>
-                        {!capacityFetchError && slot ? (
-                          <span className={full ? "slotCapacityHint slotCapacityHintFull" : "slotCapacityHint"}>
-                            {full ? ` (${slot.count}/${capacityPayload?.limit ?? "—"}, complet)` : ` — ${remaining} locuri`}
-                          </span>
-                        ) : null}
+                        {option}
                       </label>
                     );
                   })}
