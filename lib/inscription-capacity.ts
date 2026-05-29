@@ -46,15 +46,36 @@ export async function computeInscriptionSlots(): Promise<{
 }
 
 const MAX_SERIALIZABLE_RETRIES = 8;
+
+function applicationCreateData(d: InscriptionPayload, waitlisted: boolean) {
+  return {
+    parentName: d.parentName,
+    phone: d.phone,
+    email: d.email,
+    childName: d.childName,
+    age: d.age,
+    school: d.school,
+    series: d.series,
+    ageCategory: d.ageCategory,
+    medicalInfo: d.medicalInfo,
+    childPassions: d.childPassions,
+    organizerNotes: d.organizerNotes,
+    discountCode: d.discountCode,
+    gdprAccepted: true,
+    waitlisted,
+  };
+}
+
 /**
- * Serialize-safe create: prevents overbooking when many parents submit together.
+ * Serialize-safe create. Înscrierile peste limita de 25 / grupă / săptămână sunt acceptate
+ * și marcate waitlisted (listă de așteptare).
  */
-export async function createApplicationIfSlotAvailable(
+export async function createInscriptionApplication(
   d: InscriptionPayload,
-): Promise<{ ok: true; applicationId: string } | { ok: false; code: "SLOT_FULL" }> {
+): Promise<{ applicationId: string; waitlisted: boolean }> {
   for (let attempt = 0; attempt < MAX_SERIALIZABLE_RETRIES; attempt++) {
     try {
-      const row = await prisma.$transaction(
+      return await prisma.$transaction(
         async (tx) => {
           const cnt = await tx.application.count({
             where: {
@@ -63,36 +84,16 @@ export async function createApplicationIfSlotAvailable(
             },
           });
 
-          if (cnt >= INSCRIPTION_SLOT_CAPACITY_PER_GROUP) {
-            return null;
-          }
+          const waitlisted = cnt >= INSCRIPTION_SLOT_CAPACITY_PER_GROUP;
 
-          return tx.application.create({
-            data: {
-              parentName: d.parentName,
-              phone: d.phone,
-              email: d.email,
-              childName: d.childName,
-              age: d.age,
-              school: d.school,
-              series: d.series,
-              ageCategory: d.ageCategory,
-              medicalInfo: d.medicalInfo,
-              childPassions: d.childPassions,
-              organizerNotes: d.organizerNotes,
-              discountCode: d.discountCode,
-              gdprAccepted: true,
-            },
+          const row = await tx.application.create({
+            data: applicationCreateData(d, waitlisted),
           });
+
+          return { applicationId: row.id, waitlisted };
         },
         { isolationLevel: "Serializable", maxWait: 5000, timeout: 12000 },
       );
-
-      if (row === null) {
-        return { ok: false, code: "SLOT_FULL" };
-      }
-
-      return { ok: true, applicationId: row.id };
     } catch (e: unknown) {
       const tagged = e as { code?: string };
       if (tagged?.code === "P2034") {
@@ -103,5 +104,5 @@ export async function createApplicationIfSlotAvailable(
     }
   }
 
-  return { ok: false, code: "SLOT_FULL" };
+  throw new Error("Nu s-a putut salva înscrierea după mai multe încercări.");
 }

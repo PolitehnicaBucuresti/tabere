@@ -24,6 +24,7 @@ model Application {
   organizerNotes  String   @db.Text
   discountCode    String   @default("") @db.VarChar(120)
   gdprAccepted    Boolean
+  waitlisted      Boolean  @default(false)
 }
 
 model NotificationRecipient {

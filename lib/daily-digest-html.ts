@@ -16,6 +16,7 @@ export function getDailyDigestEmailHtml(rows: Application[], dateLabel: string):
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.series)}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.ageCategory)}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.discountCode || "—")}</td>
+      <td style="padding:8px;border:1px solid #d7e0ef;">${r.waitlisted ? "Da" : "Nu"}</td>
     </tr>`,
     )
     .join("");
@@ -39,9 +40,10 @@ export function getDailyDigestEmailHtml(rows: Application[], dateLabel: string):
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Săptămână</th>
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Grupă</th>
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Cod reducere</th>
+          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Listă așteptare</th>
         </tr>
       </thead>
-      <tbody>${rowsHtml || `<tr><td colspan="9" style="padding:12px;">Nu există înscrieri în baza de date.</td></tr>`}</tbody>
+      <tbody>${rowsHtml || `<tr><td colspan="10" style="padding:12px;">Nu există înscrieri în baza de date.</td></tr>`}</tbody>
     </table>
   </div>
 </body></html>`;

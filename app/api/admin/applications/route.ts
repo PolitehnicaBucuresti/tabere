@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/admin-api-guard";
+import { createInscriptionApplication } from "@/lib/inscription-capacity";
 import { inscriptionPayloadSchema } from "@/lib/inscription-schema";
 
 export async function GET(request: NextRequest) {
@@ -32,23 +33,8 @@ export async function POST(request: NextRequest) {
   }
 
   const d = parsed.data;
-  const app = await prisma.application.create({
-    data: {
-      parentName: d.parentName,
-      phone: d.phone,
-      email: d.email,
-      childName: d.childName,
-      age: d.age,
-      school: d.school,
-      series: d.series,
-      ageCategory: d.ageCategory,
-      medicalInfo: d.medicalInfo,
-      childPassions: d.childPassions,
-      organizerNotes: d.organizerNotes,
-      discountCode: d.discountCode,
-      gdprAccepted: true,
-    },
-  });
+  const saved = await createInscriptionApplication(d);
+  const app = await prisma.application.findUniqueOrThrow({ where: { id: saved.applicationId } });
 
   return NextResponse.json(app, { status: 201 });
 }

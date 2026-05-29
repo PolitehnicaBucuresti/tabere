@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { inscriptionPayloadSchema } from "@/lib/inscription-schema";
 import { sendInscriptionEmails } from "@/lib/email";
-import { createApplicationIfSlotAvailable } from "@/lib/inscription-capacity";
+import { createInscriptionApplication } from "@/lib/inscription-capacity";
 import { isStrictOriginAllowed } from "@/lib/inscriere-http-allow";
 
 function isOriginAllowed(request: NextRequest): boolean {
@@ -47,18 +47,26 @@ export async function POST(request: NextRequest) {
   const d = parsed.data;
 
   try {
-    const saved = await createApplicationIfSlotAvailable(d);
-    if (!saved.ok) {
+    const saved = await createInscriptionApplication(d);
+    const emailResult = await sendInscriptionEmails(d, { waitlisted: saved.waitlisted });
+    if (!emailResult.success) {
+      console.error("[inscriere] SMTP:", emailResult.error ?? "unknown");
+
+      const generic =
+        "Înscrierea a fost procesată, dar notificarea prin e-mail a eșuat.";
+
       return NextResponse.json(
         {
           ok: false,
-          error:
-            "Nu mai sunt locuri disponibile pentru această săptămână și grupă de vârstă. Alegeți alta sau contactați organizatorii.",
-          code: "SLOT_FULL",
+          error: generic,
+          waitlisted: saved.waitlisted,
+          ...(emailResult.error ? { details: emailResult.error } : {}),
         },
-        { status: 409 },
+        { status: 500 },
       );
     }
+
+    return NextResponse.json({ ok: true, waitlisted: saved.waitlisted });
   } catch (e) {
     console.error("[inscriere] DB:", e);
     return NextResponse.json(
@@ -66,24 +74,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-
-  // Send SMTP emails
-  const emailResult = await sendInscriptionEmails(d);
-  if (!emailResult.success) {
-    console.error("[inscriere] SMTP:", emailResult.error ?? "unknown");
-
-    const generic =
-      "Înscrierea a fost procesată, dar notificarea prin e-mail a eșuat.";
-
-    return NextResponse.json(
-      {
-        ok: false,
-        error: generic,
-        ...(emailResult.error ? { details: emailResult.error } : {}),
-      },
-      { status: 500 },
-    );
-  }
-
-  return NextResponse.json({ ok: true });
 }

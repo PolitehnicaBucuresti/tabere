@@ -85,6 +85,7 @@ export default function AplicatiiListPage() {
                 <th>Părinte</th>
                 <th>E-mail</th>
                 <th>Săptămână</th>
+                <th>Status</th>
                 <th>Cod reducere</th>
                 <th>Acțiuni</th>
               </tr>
@@ -98,6 +99,7 @@ export default function AplicatiiListPage() {
                   <td>{r.parentName}</td>
                   <td>{r.email}</td>
                   <td>{r.series}</td>
+                  <td>{r.waitlisted ? "Listă așteptare" : "Confirmat"}</td>
                   <td>{r.discountCode?.trim() ? r.discountCode : "—"}</td>
                   <td>
                     <div className="adminTableActions">
