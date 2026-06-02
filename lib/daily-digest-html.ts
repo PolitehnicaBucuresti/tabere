@@ -1,9 +1,15 @@
 import type { Application } from "@prisma/client";
+import {
+  buildRegistrationRankByApplicationId,
+  isApplicationWaitlisted,
+  resolveRegistrationStatus,
+} from "@/lib/application-registration-status";
 import { groupApplicationsBySlot } from "@/lib/applications-grouping";
 
 const TABLE_HEAD = `
         <tr style="background:#edf3ff;">
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Dată</th>
+          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Status</th>
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Copil</th>
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Părinte</th>
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Telefon</th>
@@ -11,16 +17,23 @@ const TABLE_HEAD = `
           <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Cod reducere</th>
         </tr>`;
 
-function renderGroupSection(group: {
-  ageCategory: string;
-  series: string;
-  applications: Application[];
-}): string {
+function renderGroupSection(
+  group: {
+    ageCategory: string;
+    series: string;
+    applications: Application[];
+  },
+  rankById: Map<string, number>,
+): string {
+  const confirmed = group.applications.filter((a) => !isApplicationWaitlisted(a, rankById)).length;
+  const waitlist = group.applications.length - confirmed;
+
   const rowsHtml = group.applications
     .map(
       (r) => `
     <tr>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(formatCreatedAtDate(r.createdAt))}</td>
+      <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(resolveRegistrationStatus(r, rankById))}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.childName)}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.parentName)}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(String(r.phone ?? ""))}</td>
@@ -33,14 +46,19 @@ function renderGroupSection(group: {
   const tableBody =
     group.applications.length > 0
       ? rowsHtml
-      : `<tr><td colspan="6" style="padding:12px;border:1px solid #d7e0ef;color:#536685;">Nu există înscrieri.</td></tr>`;
+      : `<tr><td colspan="7" style="padding:12px;border:1px solid #d7e0ef;color:#536685;">Nu există înscrieri.</td></tr>`;
+
+  const subcounts =
+    group.applications.length > 0
+      ? ` <span style="color:#536685;font-weight:500;">(${confirmed} înscriși, ${waitlist} listă așteptare)</span>`
+      : "";
 
   return `
     <section style="margin-top:28px;">
       <h2 style="color:#1e315f;font-size:17px;margin:0 0 12px;line-height:1.45;">
         Grupa de vârstă: <strong>${escapeHtml(group.ageCategory)}</strong> —
         Perioada: <strong>${escapeHtml(group.series)}</strong>:
-        <strong>${group.applications.length}</strong> înscrieri
+        <strong>${group.applications.length}</strong> înscrieri${subcounts}
       </h2>
       <table style="border-collapse:collapse;width:100%;font-size:14px;">
         <thead>${TABLE_HEAD}</thead>
@@ -53,8 +71,9 @@ function renderGroupSection(group: {
  * HTML body: înscrieri grupate pe grupă de vârstă și perioadă.
  */
 export function getDailyDigestEmailHtml(rows: Application[], dateLabel: string): string {
+  const rankById = buildRegistrationRankByApplicationId(rows);
   const groups = groupApplicationsBySlot(rows);
-  const sectionsHtml = groups.map(renderGroupSection).join("");
+  const sectionsHtml = groups.map((g) => renderGroupSection(g, rankById)).join("");
 
   return `
 <!DOCTYPE html>

@@ -47,7 +47,7 @@ export async function computeInscriptionSlots(): Promise<{
 
 const MAX_SERIALIZABLE_RETRIES = 8;
 
-function applicationCreateData(d: InscriptionPayload) {
+function applicationCreateData(d: InscriptionPayload, waitlisted: boolean) {
   return {
     parentName: d.parentName,
     phone: d.phone,
@@ -62,7 +62,7 @@ function applicationCreateData(d: InscriptionPayload) {
     organizerNotes: d.organizerNotes,
     discountCode: d.discountCode,
     gdprAccepted: true,
-    waitlisted: false,
+    waitlisted,
   };
 }
 
@@ -71,10 +71,12 @@ function applicationCreateData(d: InscriptionPayload) {
  */
 export async function createInscriptionApplication(
   d: InscriptionPayload,
-): Promise<{ ok: true; applicationId: string } | { ok: false; code: "SLOT_FULL" }> {
+): Promise<
+  { ok: true; applicationId: string; waitlisted: boolean } | { ok: false; code: "SLOT_FULL" }
+> {
   for (let attempt = 0; attempt < MAX_SERIALIZABLE_RETRIES; attempt++) {
     try {
-      const row = await prisma.$transaction(
+      const result = await prisma.$transaction(
         async (tx) => {
           const cnt = await tx.application.count({
             where: {
@@ -87,18 +89,21 @@ export async function createInscriptionApplication(
             return null;
           }
 
-          return tx.application.create({
-            data: applicationCreateData(d),
+          const waitlisted = cnt + 1 > INSCRIPTION_SLOT_CAPACITY_PER_GROUP;
+          const row = await tx.application.create({
+            data: applicationCreateData(d, waitlisted),
           });
+
+          return { row, waitlisted };
         },
         { isolationLevel: "Serializable", maxWait: 5000, timeout: 12000 },
       );
 
-      if (row === null) {
+      if (result === null) {
         return { ok: false, code: "SLOT_FULL" };
       }
 
-      return { ok: true, applicationId: row.id };
+      return { ok: true, applicationId: result.row.id, waitlisted: result.waitlisted };
     } catch (e: unknown) {
       const tagged = e as { code?: string };
       if (tagged?.code === "P2034") {

@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
 import { InscriptionPayload } from "./inscription-schema";
+import { registrationStatusLabel } from "./application-registration-status";
 
 /** Strip characters that break SMTP headers or MIME display-name wrapping. */
 function sanitizeHeaderDisplayName(value: string, max = 72): string {
@@ -73,7 +74,7 @@ function createSmtpTransporter() {
 /**
  * Generate a beautifully styled, premium HTML email for the administrator.
  */
-function getAdminEmailHtml(data: InscriptionPayload): string {
+function getAdminEmailHtml(data: InscriptionPayload, registrationStatus: string): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -206,6 +207,10 @@ function getAdminEmailHtml(data: InscriptionPayload): string {
         <div class="content">
           <div class="section-title">Informații Program</div>
           <table>
+            <tr>
+              <th>Status înscriere</th>
+              <td><span class="badge">${escapeHtml(registrationStatus)}</span></td>
+            </tr>
             <tr>
               <th>Categorie vârstă</th>
               <td><span class="badge">${escapeHtml(data.ageCategory)}</span></td>
@@ -590,7 +595,11 @@ function getParentConfirmationHtml(data: InscriptionPayload): string {
  *    and always to marketing@upb.ro for review (override via INSCRIPTION_MARKETING_REVIEW_EMAIL).
  * 2. A confirmation email to the parent (data.email).
  */
-export async function sendInscriptionEmails(data: InscriptionPayload): Promise<{ success: boolean; error?: string }> {
+export async function sendInscriptionEmails(
+  data: InscriptionPayload,
+  options: { waitlisted?: boolean } = {},
+): Promise<{ success: boolean; error?: string }> {
+  const registrationStatus = registrationStatusLabel(options.waitlisted === true);
   try {
     const smtpFrom =
       process.env.SMTP_FROM_EMAIL?.trim() ||
@@ -622,11 +631,12 @@ export async function sendInscriptionEmails(data: InscriptionPayload): Promise<{
     const safeChildName = sanitizeSubjectPart(data.childName);
 
     // 1. Staff notification (same HTML body to every recipient — full form data)
+    const statusTag = options.waitlisted === true ? "Listă așteptare" : "Înscris";
     const adminMailOptions = {
       from: `"${safeParentName} via Taberele Micilor Ingineri" <${smtpFrom}>`,
       to: adminRecipients,
-      subject: `[Înscriere Nouă] ${safeChildName} - ${data.ageCategory} - ${data.series}`,
-      html: getAdminEmailHtml(data),
+      subject: `[Înscriere Nouă · ${statusTag}] ${safeChildName} - ${data.ageCategory} - ${data.series}`,
+      html: getAdminEmailHtml(data, registrationStatus),
       replyTo: data.email,
     };
 

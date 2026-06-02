@@ -1,5 +1,9 @@
 import ExcelJS from "exceljs";
 import type { Application } from "@prisma/client";
+import {
+  buildRegistrationRankByApplicationId,
+  resolveRegistrationStatus,
+} from "@/lib/application-registration-status";
 
 /** Same workbook as admin „Export Excel” — used by the API route and daily digest e-mail. */
 export async function buildApplicationsExcelBuffer(apps: Application[]): Promise<Buffer> {
@@ -24,16 +28,21 @@ export async function buildApplicationsExcelBuffer(apps: Application[]): Promise
     "Pasiuni",
     "Mesaj organizatori",
     "Cod reducere",
+    "Status înscriere",
     "GDPR",
   ] as const;
 
   ws.addRow([...headers]);
   ws.getRow(1).font = { bold: true };
 
+  const rankById = buildRegistrationRankByApplicationId(apps);
+
   for (const r of apps) {
+    const createdAt =
+      r.createdAt instanceof Date ? r.createdAt.toISOString() : new Date(r.createdAt).toISOString();
     ws.addRow([
       r.id,
-      r.createdAt.toISOString(),
+      createdAt,
       r.parentName,
       r.phone,
       r.email,
@@ -46,6 +55,7 @@ export async function buildApplicationsExcelBuffer(apps: Application[]): Promise
       r.childPassions,
       r.organizerNotes,
       r.discountCode || "",
+      resolveRegistrationStatus(r, rankById),
       r.gdprAccepted ? "Da" : "Nu",
     ]);
   }

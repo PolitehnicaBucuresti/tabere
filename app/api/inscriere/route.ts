@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const emailResult = await sendInscriptionEmails(d);
+    const emailResult = await sendInscriptionEmails(d, { waitlisted: saved.waitlisted });
     if (!emailResult.success) {
       console.error("[inscriere] SMTP:", emailResult.error ?? "unknown");
 
