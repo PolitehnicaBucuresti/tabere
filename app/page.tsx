@@ -8,6 +8,7 @@ import {
   type InscriptionAgeCategory,
   INSCRIPTION_AGE_CATEGORIES,
   INSCRIPTION_SERIES_OPTIONS,
+  INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP,
   INSCRIPTION_SLOT_CAPACITY_PER_GROUP,
   INSCRIPTION_SLOT_FULL_MESSAGE,
   INSCRIPTION_SIBLING_DISCOUNT_LABEL,
@@ -558,10 +559,12 @@ export default function Home() {
             <div className="signupFormPanel">
               <div className="signupFormIntro">
                 <p className="signupCapacityBanner">
-                  Fiecare grupă de vârstă: până la{" "}
-                  <strong>{INSCRIPTION_SLOT_CAPACITY_PER_GROUP}</strong> copii / săptămână{" "}
+                  Fiecare grupă de vârstă: <strong>{INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP}</strong> locuri
+                  confirmate / perioadă; până la{" "}
+                  <strong>{INSCRIPTION_SLOT_CAPACITY_PER_GROUP}</strong> înscrieri în total (inclusiv listă de
+                  așteptare){" "}
                   <span className="signupCapacityBannerSub">
-                    (max. {INSCRIPTION_SLOT_CAPACITY_PER_GROUP * INSCRIPTION_AGE_CATEGORIES.length} copii / săptămână
+                    (max. {INSCRIPTION_SLOT_CAPACITY_PER_GROUP * INSCRIPTION_AGE_CATEGORIES.length} înscrieri / perioadă
                     pentru toate grupele).
                   </span>
                 </p>

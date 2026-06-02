@@ -3,6 +3,7 @@ import type { InscriptionPayload } from "@/lib/inscription-schema";
 import {
   INSCRIPTION_AGE_CATEGORIES,
   INSCRIPTION_SERIES_OPTIONS,
+  INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP,
   INSCRIPTION_SLOT_CAPACITY_PER_GROUP,
 } from "@/lib/inscription-constants";
 import type { SlotCountMap } from "@/lib/inscription-slot-helpers";
@@ -89,7 +90,7 @@ export async function createInscriptionApplication(
             return null;
           }
 
-          const waitlisted = cnt + 1 > INSCRIPTION_SLOT_CAPACITY_PER_GROUP;
+          const waitlisted = cnt + 1 > INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP;
           const row = await tx.application.create({
             data: applicationCreateData(d, waitlisted),
           });

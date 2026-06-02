@@ -11,7 +11,10 @@ export const INSCRIPTION_AGE_CATEGORIES = ["5-7 ani", "7-9 ani", "9-11 ani"] as 
 
 export type InscriptionAgeCategory = (typeof INSCRIPTION_AGE_CATEGORIES)[number];
 
-/** Maxim copii înscrise per săptămână și categorie de vârstă. */
+/** Locuri confirmate (status „Înscris”) per grupă de vârstă și perioadă. */
+export const INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP = 25;
+
+/** Maxim înscrieri acceptate în total (inclusiv listă de așteptare) per grupă / perioadă. */
 export const INSCRIPTION_SLOT_CAPACITY_PER_GROUP = 40;
 
 /** Mesaj afișat când combinația grupă + perioadă este completă. */
