@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/admin-api-guard";
 import { createInscriptionApplication } from "@/lib/inscription-capacity";
+import { INSCRIPTION_SLOT_FULL_MESSAGE } from "@/lib/inscription-constants";
 import { inscriptionPayloadSchema } from "@/lib/inscription-schema";
 
 export async function GET(request: NextRequest) {
@@ -34,6 +35,9 @@ export async function POST(request: NextRequest) {
 
   const d = parsed.data;
   const saved = await createInscriptionApplication(d);
+  if (!saved.ok) {
+    return NextResponse.json({ error: INSCRIPTION_SLOT_FULL_MESSAGE, code: "SLOT_FULL" }, { status: 409 });
+  }
   const app = await prisma.application.findUniqueOrThrow({ where: { id: saved.applicationId } });
 
   return NextResponse.json(app, { status: 201 });

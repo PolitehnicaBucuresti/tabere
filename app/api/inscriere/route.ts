@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { inscriptionPayloadSchema } from "@/lib/inscription-schema";
 import { sendInscriptionEmails } from "@/lib/email";
 import { createInscriptionApplication } from "@/lib/inscription-capacity";
+import { INSCRIPTION_SLOT_FULL_MESSAGE } from "@/lib/inscription-constants";
 import { isStrictOriginAllowed } from "@/lib/inscriere-http-allow";
 
 function isOriginAllowed(request: NextRequest): boolean {
@@ -48,7 +49,18 @@ export async function POST(request: NextRequest) {
 
   try {
     const saved = await createInscriptionApplication(d);
-    const emailResult = await sendInscriptionEmails(d, { waitlisted: saved.waitlisted });
+    if (!saved.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: INSCRIPTION_SLOT_FULL_MESSAGE,
+          code: "SLOT_FULL",
+        },
+        { status: 409 },
+      );
+    }
+
+    const emailResult = await sendInscriptionEmails(d);
     if (!emailResult.success) {
       console.error("[inscriere] SMTP:", emailResult.error ?? "unknown");
 
@@ -59,14 +71,13 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           error: generic,
-          waitlisted: saved.waitlisted,
           ...(emailResult.error ? { details: emailResult.error } : {}),
         },
         { status: 500 },
       );
     }
 
-    return NextResponse.json({ ok: true, waitlisted: saved.waitlisted });
+    return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("[inscriere] DB:", e);
     return NextResponse.json(

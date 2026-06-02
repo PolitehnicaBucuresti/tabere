@@ -1,10 +1,22 @@
 import type { Application } from "@prisma/client";
+import { groupApplicationsBySlot } from "@/lib/applications-grouping";
 
-/**
- * HTML body: summary list of applications for daily digest email.
- */
-export function getDailyDigestEmailHtml(rows: Application[], dateLabel: string): string {
-  const rowsHtml = rows
+const TABLE_HEAD = `
+        <tr style="background:#edf3ff;">
+          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Dată</th>
+          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Copil</th>
+          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Părinte</th>
+          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Telefon</th>
+          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">E-mail</th>
+          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Cod reducere</th>
+        </tr>`;
+
+function renderGroupSection(group: {
+  ageCategory: string;
+  series: string;
+  applications: Application[];
+}): string {
+  const rowsHtml = group.applications
     .map(
       (r) => `
     <tr>
@@ -13,13 +25,36 @@ export function getDailyDigestEmailHtml(rows: Application[], dateLabel: string):
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.parentName)}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(String(r.phone ?? ""))}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.email)}</td>
-      <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.series)}</td>
-      <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.ageCategory)}</td>
-      <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.discountCode || "—")}</td>
-      <td style="padding:8px;border:1px solid #d7e0ef;">${r.waitlisted ? "Da" : "Nu"}</td>
+      <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.discountCode?.trim() ? r.discountCode : "—")}</td>
     </tr>`,
     )
     .join("");
+
+  const tableBody =
+    group.applications.length > 0
+      ? rowsHtml
+      : `<tr><td colspan="6" style="padding:12px;border:1px solid #d7e0ef;color:#536685;">Nu există înscrieri.</td></tr>`;
+
+  return `
+    <section style="margin-top:28px;">
+      <h2 style="color:#1e315f;font-size:17px;margin:0 0 12px;line-height:1.45;">
+        Grupa de vârstă: <strong>${escapeHtml(group.ageCategory)}</strong> —
+        Perioada: <strong>${escapeHtml(group.series)}</strong>:
+        <strong>${group.applications.length}</strong> înscrieri
+      </h2>
+      <table style="border-collapse:collapse;width:100%;font-size:14px;">
+        <thead>${TABLE_HEAD}</thead>
+        <tbody>${tableBody}</tbody>
+      </table>
+    </section>`;
+}
+
+/**
+ * HTML body: înscrieri grupate pe grupă de vârstă și perioadă.
+ */
+export function getDailyDigestEmailHtml(rows: Application[], dateLabel: string): string {
+  const groups = groupApplicationsBySlot(rows);
+  const sectionsHtml = groups.map(renderGroupSection).join("");
 
   return `
 <!DOCTYPE html>
@@ -29,22 +64,7 @@ export function getDailyDigestEmailHtml(rows: Application[], dateLabel: string):
     <h1 style="color:#1e315f;">Taberele Micilor Ingineri — rezumat înscrieri</h1>
     <p style="color:#536685;">Data raportului: <strong>${escapeHtml(dateLabel)}</strong></p>
     <p style="color:#536685;">Total înscrieri (în baza de date): <strong>${rows.length}</strong></p>
-    <table style="border-collapse:collapse;width:100%;font-size:14px;margin-top:16px;">
-      <thead>
-        <tr style="background:#edf3ff;">
-          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Dată</th>
-          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Copil</th>
-          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Părinte</th>
-          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Telefon</th>
-          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">E-mail</th>
-          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Săptămână</th>
-          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Grupă</th>
-          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Cod reducere</th>
-          <th style="padding:8px;border:1px solid #d7e0ef;text-align:left;">Listă așteptare</th>
-        </tr>
-      </thead>
-      <tbody>${rowsHtml || `<tr><td colspan="10" style="padding:12px;">Nu există înscrieri în baza de date.</td></tr>`}</tbody>
-    </table>
+    ${sectionsHtml}
   </div>
 </body></html>`;
 }

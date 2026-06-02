@@ -12,7 +12,11 @@ export const INSCRIPTION_AGE_CATEGORIES = ["5-7 ani", "7-9 ani", "9-11 ani"] as 
 export type InscriptionAgeCategory = (typeof INSCRIPTION_AGE_CATEGORIES)[number];
 
 /** Maxim copii înscrise per săptămână și categorie de vârstă. */
-export const INSCRIPTION_SLOT_CAPACITY_PER_GROUP = 25;
+export const INSCRIPTION_SLOT_CAPACITY_PER_GROUP = 40;
+
+/** Mesaj afișat când combinația grupă + perioadă este completă. */
+export const INSCRIPTION_SLOT_FULL_MESSAGE =
+  "Ne pare rău, pentru grupa de vârstă și perioada aleasă s-a atins numărul maxim de înscrieri.";
 
 /** Tarif afișat în formular și secțiunea „Program și tarife”. */
 export const INSCRIPTION_WEEKLY_PRICE_AMOUNT = "1 100 RON";

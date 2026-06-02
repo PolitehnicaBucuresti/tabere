@@ -47,7 +47,7 @@ export async function computeInscriptionSlots(): Promise<{
 
 const MAX_SERIALIZABLE_RETRIES = 8;
 
-function applicationCreateData(d: InscriptionPayload, waitlisted: boolean) {
+function applicationCreateData(d: InscriptionPayload) {
   return {
     parentName: d.parentName,
     phone: d.phone,
@@ -62,20 +62,19 @@ function applicationCreateData(d: InscriptionPayload, waitlisted: boolean) {
     organizerNotes: d.organizerNotes,
     discountCode: d.discountCode,
     gdprAccepted: true,
-    waitlisted,
+    waitlisted: false,
   };
 }
 
 /**
- * Serialize-safe create. Înscrierile peste limita de 25 / grupă / săptămână sunt acceptate
- * și marcate waitlisted (listă de așteptare).
+ * Serialize-safe create: refuză înscrierea când grupa + perioada au deja 40 de înscrieri.
  */
 export async function createInscriptionApplication(
   d: InscriptionPayload,
-): Promise<{ applicationId: string; waitlisted: boolean }> {
+): Promise<{ ok: true; applicationId: string } | { ok: false; code: "SLOT_FULL" }> {
   for (let attempt = 0; attempt < MAX_SERIALIZABLE_RETRIES; attempt++) {
     try {
-      return await prisma.$transaction(
+      const row = await prisma.$transaction(
         async (tx) => {
           const cnt = await tx.application.count({
             where: {
@@ -84,16 +83,22 @@ export async function createInscriptionApplication(
             },
           });
 
-          const waitlisted = cnt >= INSCRIPTION_SLOT_CAPACITY_PER_GROUP;
+          if (cnt >= INSCRIPTION_SLOT_CAPACITY_PER_GROUP) {
+            return null;
+          }
 
-          const row = await tx.application.create({
-            data: applicationCreateData(d, waitlisted),
+          return tx.application.create({
+            data: applicationCreateData(d),
           });
-
-          return { applicationId: row.id, waitlisted };
         },
         { isolationLevel: "Serializable", maxWait: 5000, timeout: 12000 },
       );
+
+      if (row === null) {
+        return { ok: false, code: "SLOT_FULL" };
+      }
+
+      return { ok: true, applicationId: row.id };
     } catch (e: unknown) {
       const tagged = e as { code?: string };
       if (tagged?.code === "P2034") {
@@ -104,5 +109,5 @@ export async function createInscriptionApplication(
     }
   }
 
-  throw new Error("Nu s-a putut salva înscrierea după mai multe încercări.");
+  return { ok: false, code: "SLOT_FULL" };
 }

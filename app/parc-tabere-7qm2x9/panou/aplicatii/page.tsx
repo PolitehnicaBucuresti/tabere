@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Application } from "@prisma/client";
 import { adminBasePath, adminPanouPath } from "@/lib/admin-config";
+import { AdminApplicationsGrouped } from "../../components/AdminApplicationsGrouped";
 import "../../admin.css";
 
 export default function AplicatiiListPage() {
@@ -75,48 +76,12 @@ export default function AplicatiiListPage() {
       {!loading && rows.length === 0 ? <p className="adminMuted">Nu există înscrieri.</p> : null}
 
       {!loading && rows.length > 0 ? (
-        <div className="adminCard" style={{ overflowX: "auto" }}>
-          <table className="adminTable">
-            <thead>
-              <tr>
-                <th className="adminTableNr">Nr.</th>
-                <th>Dată</th>
-                <th>Copil</th>
-                <th>Părinte</th>
-                <th>E-mail</th>
-                <th>Săptămână</th>
-                <th>Status</th>
-                <th>Cod reducere</th>
-                <th>Acțiuni</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => (
-                <tr key={r.id}>
-                  <td className="adminTableNr">{i + 1}</td>
-                  <td>{new Date(r.createdAt).toLocaleString("ro-RO")}</td>
-                  <td>{r.childName}</td>
-                  <td>{r.parentName}</td>
-                  <td>{r.email}</td>
-                  <td>{r.series}</td>
-                  <td>{r.waitlisted ? "Listă așteptare" : "Confirmat"}</td>
-                  <td>{r.discountCode?.trim() ? r.discountCode : "—"}</td>
-                  <td>
-                    <div className="adminTableActions">
-                      <Link href={`${adminPanouPath}/aplicatii/${r.id}`}>Editează</Link>
-                      <button type="button" className="danger" onClick={() => void remove(r.id)}>
-                        Șterge
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <>
+          <AdminApplicationsGrouped rows={rows} onRemove={remove} />
           <p className="adminMuted" style={{ marginTop: "0.75rem", marginBottom: 0 }}>
-            În total: <strong>{rows.length}</strong> înscrieri afișate în listă.
+            În total: <strong>{rows.length}</strong> înscrieri în baza de date.
           </p>
-        </div>
+        </>
       ) : null}
     </div>
   );

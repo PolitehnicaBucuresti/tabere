@@ -1,7 +1,7 @@
  "use client";
 
 import Image from "next/image";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import {
@@ -9,11 +9,18 @@ import {
   INSCRIPTION_AGE_CATEGORIES,
   INSCRIPTION_SERIES_OPTIONS,
   INSCRIPTION_SLOT_CAPACITY_PER_GROUP,
+  INSCRIPTION_SLOT_FULL_MESSAGE,
   INSCRIPTION_SIBLING_DISCOUNT_LABEL,
   INSCRIPTION_WEEKLY_PRICE_AMOUNT,
   INSCRIPTION_WEEKLY_PRICE_PERIOD,
 } from "@/lib/inscription-constants";
 import { inscriptionPayloadSchema, type InscriptionPayload } from "@/lib/inscription-schema";
+import {
+  ageCategoryFullyBooked,
+  allProgramSlotsFull,
+  isSeriesAgeFull,
+  type SlotCountMap,
+} from "@/lib/inscription-slot-helpers";
 import {
   CalendarDays,
   Clock3,
@@ -91,9 +98,6 @@ function FieldError({ message }: { message?: string }) {
 const INSCRIPTION_SUCCESS_MESSAGE =
   "Cererea a fost trimisă. Veți fi contactat în curând pentru confirmare.";
 
-const INSCRIPTION_WAITLIST_SUCCESS_MESSAGE =
-  "Îți mulțumim pentru interes! Toate locurile pentru categoria de vârstă și săptămâna selectată sunt ocupate. Înscrierea ta a intrat pe lista de așteptare și te vom contacta în cel mai scurt timp.";
-
 type ScheduleRow = {
   interval: string;
   day1: string;
@@ -107,12 +111,56 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedAgeCategory, setSelectedAgeCategory] = useState<InscriptionAgeCategory>(INSCRIPTION_AGE_CATEGORIES[0]);
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
-  const [successWaitlisted, setSuccessWaitlisted] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [smtpDiag, setSmtpDiag] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<InscriptionFieldKey, string>>>({});
   const feedbackRef = useRef<HTMLParagraphElement>(null);
   const currentYear = new Date().getFullYear();
+
+  const [capacityPayload, setCapacityPayload] = useState<{ limit: number; slots: SlotCountMap } | null>(null);
+  const [capacityLoading, setCapacityLoading] = useState(true);
+
+  const loadCapacity = useCallback(async () => {
+    setCapacityLoading(true);
+    try {
+      const res = await fetch("/api/inscriere/capacity", { headers: { Accept: "application/json" } });
+      if (!res.ok) {
+        setCapacityPayload(null);
+        return;
+      }
+      const data = (await res.json()) as { limit?: number; slots?: SlotCountMap };
+      if (typeof data.limit !== "number" || !data.slots) {
+        setCapacityPayload(null);
+        return;
+      }
+      setCapacityPayload({ limit: data.limit, slots: data.slots });
+    } catch {
+      setCapacityPayload(null);
+    } finally {
+      setCapacityLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadCapacity();
+  }, [loadCapacity]);
+
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === "visible") void loadCapacity();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [loadCapacity]);
+
+  useEffect(() => {
+    if (!capacityPayload) return;
+    setSelectedAgeCategory((prev) =>
+      ageCategoryFullyBooked(capacityPayload.slots, prev)
+        ? (INSCRIPTION_AGE_CATEGORIES.find((c) => !ageCategoryFullyBooked(capacityPayload.slots, c)) ?? prev)
+        : prev,
+    );
+  }, [capacityPayload]);
 
   useEffect(() => {
     if (formStatus !== "success") return;
@@ -149,7 +197,6 @@ export default function Home() {
     event.preventDefault();
     setFormError(null);
     setSmtpDiag(null);
-    setSuccessWaitlisted(false);
     setFieldErrors({});
 
     const formEl = event.currentTarget;
@@ -196,6 +243,21 @@ export default function Home() {
       return;
     }
 
+    const slotsSnap = capacityPayload?.slots ?? null;
+    if (
+      slotsSnap &&
+      isSeriesAgeFull(slotsSnap, validated.data.series, validated.data.ageCategory)
+    ) {
+      setFormStatus("idle");
+      setFieldErrors({ series: INSCRIPTION_SLOT_FULL_MESSAGE });
+      setFormError(INSCRIPTION_SLOT_FULL_MESSAGE);
+      toast.error(INSCRIPTION_SLOT_FULL_MESSAGE);
+      requestAnimationFrame(() => {
+        document.getElementById("inscription-series-fieldset")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      return;
+    }
+
     setFormStatus("submitting");
 
     const controller = new AbortController();
@@ -209,13 +271,13 @@ export default function Home() {
         signal: controller.signal,
       });
 
-      let data: { ok?: boolean; error?: string; details?: string; waitlisted?: boolean } = {};
+      let data: { ok?: boolean; error?: string; details?: string; code?: string } = {};
       try {
         data = (await res.json()) as {
           ok?: boolean;
           error?: string;
           details?: string;
-          waitlisted?: boolean;
+          code?: string;
         };
       } catch {
         data = {};
@@ -223,9 +285,17 @@ export default function Home() {
 
       if (!res.ok || !data.ok) {
         setFormStatus("error");
-        const msg = data.error ?? "A apărut o problemă la trimitere. Încearcă din nou.";
+        if (res.status === 409 || data.code === "SLOT_FULL") {
+          void loadCapacity();
+        }
+        const msg =
+          data.error ??
+          (res.status === 409 ? INSCRIPTION_SLOT_FULL_MESSAGE : "A apărut o problemă la trimitere. Încearcă din nou.");
         setFormError(msg);
         setSmtpDiag(typeof data.details === "string" ? data.details : null);
+        if (res.status === 409 || data.code === "SLOT_FULL") {
+          setFieldErrors({ series: INSCRIPTION_SLOT_FULL_MESSAGE });
+        }
         toast.error(msg, data.details ? { description: data.details } : undefined);
         return;
       }
@@ -233,10 +303,16 @@ export default function Home() {
       setFieldErrors({});
       setFormError(null);
       setSmtpDiag(null);
-      setSuccessWaitlisted(data.waitlisted === true);
       setFormStatus("success");
       formEl.reset();
-      setSelectedAgeCategory(INSCRIPTION_AGE_CATEGORIES[0]);
+      const avail =
+        capacityPayload?.slots != null
+          ? (INSCRIPTION_AGE_CATEGORIES.find(
+              (c) => !ageCategoryFullyBooked(capacityPayload.slots, c),
+            ) ?? INSCRIPTION_AGE_CATEGORIES[0])
+          : INSCRIPTION_AGE_CATEGORIES[0];
+      setSelectedAgeCategory(avail);
+      void loadCapacity();
     } catch (err) {
       setFormStatus("error");
       if (err instanceof DOMException && err.name === "AbortError") {
@@ -268,7 +344,17 @@ export default function Home() {
     });
   }
 
-  const inscriptionSubmitDisabled = formStatus === "submitting";
+  const inscriptionSlots = capacityPayload?.slots ?? null;
+  const chosenAgeHasNoWeeks =
+    !!inscriptionSlots &&
+    INSCRIPTION_SERIES_OPTIONS.every((s) =>
+      isSeriesAgeFull(inscriptionSlots, s, selectedAgeCategory),
+    );
+  const inscriptionSubmitDisabled =
+    formStatus === "submitting" ||
+    capacityLoading ||
+    (inscriptionSlots !== null && allProgramSlotsFull(inscriptionSlots)) ||
+    chosenAgeHasNoWeeks;
 
   return (
     <div className="siteWrap">
@@ -518,9 +604,7 @@ export default function Home() {
                       tabIndex={-1}
                       className="signupFormStatus signupFormStatusSuccess"
                     >
-                      {successWaitlisted
-                        ? INSCRIPTION_WAITLIST_SUCCESS_MESSAGE
-                        : INSCRIPTION_SUCCESS_MESSAGE}
+                      {INSCRIPTION_SUCCESS_MESSAGE}
                     </p>
                   ) : null}
                   {formStatus === "error" && formError ? (
@@ -541,13 +625,24 @@ export default function Home() {
                   role="tablist"
                   aria-label="Categorie de vârstă pentru înscriere"
                 >
-                  {INSCRIPTION_AGE_CATEGORIES.map((category) => (
+                  {INSCRIPTION_AGE_CATEGORIES.map((category) => {
+                    const booked =
+                      !capacityLoading &&
+                      inscriptionSlots !== null &&
+                      ageCategoryFullyBooked(inscriptionSlots, category);
+                    return (
                       <button
                         key={category}
                         type="button"
                         role="tab"
                         className={`ageTab ${selectedAgeCategory === category ? "isActive" : ""}`}
                         aria-selected={selectedAgeCategory === category}
+                        disabled={booked}
+                        title={
+                          booked
+                            ? "Toate perioadele sunt complete pentru această grupă de vârstă."
+                            : undefined
+                        }
                         onClick={() => {
                           setSelectedAgeCategory(category);
                           setFieldErrors((prev) => {
@@ -559,8 +654,15 @@ export default function Home() {
                         }}
                       >
                         {category}
+                        {booked ? (
+                          <span className="ageTabBadge" aria-hidden="true">
+                            {" "}
+                            complet
+                          </span>
+                        ) : null}
                       </button>
-                    ))}
+                    );
+                  })}
                 </div>
                 <FieldError message={fieldErrors.ageCategory} />
                 <input type="hidden" name="ageCategory" value={selectedAgeCategory} />
@@ -654,12 +756,20 @@ export default function Home() {
                   aria-required="true"
                 >
                   <legend>Alegerea programului</legend>
-                  {INSCRIPTION_SERIES_OPTIONS.map((option) => (
-                      <label key={option} className="checkboxLabel radioLabel">
-                        <input type="radio" name="series" value={option} />
+                  {INSCRIPTION_SERIES_OPTIONS.map((option) => {
+                    const full =
+                      !!inscriptionSlots &&
+                      isSeriesAgeFull(inscriptionSlots, option, selectedAgeCategory);
+                    return (
+                      <label
+                        key={option}
+                        className={`checkboxLabel radioLabel ${full ? "radioLabelDisabled" : ""}`}
+                      >
+                        <input type="radio" name="series" value={option} disabled={full} />
                         {option}
                       </label>
-                    ))}
+                    );
+                  })}
                   <FieldError message={fieldErrors.series} />
                 </fieldset>
 

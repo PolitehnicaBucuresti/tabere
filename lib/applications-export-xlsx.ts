@@ -24,7 +24,6 @@ export async function buildApplicationsExcelBuffer(apps: Application[]): Promise
     "Pasiuni",
     "Mesaj organizatori",
     "Cod reducere",
-    "Listă așteptare",
     "GDPR",
   ] as const;
 
@@ -47,7 +46,6 @@ export async function buildApplicationsExcelBuffer(apps: Application[]): Promise
       r.childPassions,
       r.organizerNotes,
       r.discountCode || "",
-      r.waitlisted ? "Da" : "Nu",
       r.gdprAccepted ? "Da" : "Nu",
     ]);
   }

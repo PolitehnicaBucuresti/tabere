@@ -195,6 +195,36 @@
   color: #1e315f;
 }
 
+.adminGroupedList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.adminGroupSection {
+  margin-bottom: 1.25rem;
+}
+
+.adminGroupHeading {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e315f;
+  margin: 0 0 0.85rem;
+  line-height: 1.45;
+}
+
+.adminGroupHeading strong {
+  color: #274b96;
+}
+
+.adminGroupEmpty {
+  margin: 0;
+}
+
+.adminTableWrap {
+  overflow-x: auto;
+}
+
 .adminRow {
   display: flex;
   flex-wrap: wrap;
