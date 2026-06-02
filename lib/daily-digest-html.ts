@@ -20,7 +20,7 @@ function renderGroupSection(group: {
     .map(
       (r) => `
     <tr>
-      <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.createdAt.toISOString().slice(0, 10))}</td>
+      <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(formatCreatedAtDate(r.createdAt))}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.childName)}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(r.parentName)}</td>
       <td style="padding:8px;border:1px solid #d7e0ef;">${escapeHtml(String(r.phone ?? ""))}</td>
@@ -67,6 +67,11 @@ export function getDailyDigestEmailHtml(rows: Application[], dateLabel: string):
     ${sectionsHtml}
   </div>
 </body></html>`;
+}
+
+function formatCreatedAtDate(createdAt: Date | string): string {
+  const d = createdAt instanceof Date ? createdAt : new Date(createdAt);
+  return Number.isFinite(d.getTime()) ? d.toISOString().slice(0, 10) : "—";
 }
 
 function escapeHtml(s: string): string {

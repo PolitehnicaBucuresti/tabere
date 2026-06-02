@@ -14,6 +14,12 @@ function slotKey(ageCategory: string, series: string): string {
   return `${ageCategory}\0${series}`;
 }
 
+/** API JSON trimite `createdAt` ca string; Prisma pe server ca Date. */
+function createdAtMs(createdAt: Date | string): number {
+  const t = createdAt instanceof Date ? createdAt.getTime() : new Date(createdAt).getTime();
+  return Number.isFinite(t) ? t : 0;
+}
+
 /** Grupează înscrierile în ordinea canonică: grupă de vârstă × perioadă. */
 export function groupApplicationsBySlot(apps: Application[]): ApplicationSlotGroup[] {
   const byKey = new Map<string, Application[]>();
@@ -26,7 +32,7 @@ export function groupApplicationsBySlot(apps: Application[]): ApplicationSlotGro
   }
 
   for (const list of byKey.values()) {
-    list.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    list.sort((a, b) => createdAtMs(b.createdAt) - createdAtMs(a.createdAt));
   }
 
   const groups: ApplicationSlotGroup[] = [];
