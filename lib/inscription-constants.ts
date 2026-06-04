@@ -25,4 +25,8 @@ export const INSCRIPTION_SLOT_FULL_MESSAGE =
 export const INSCRIPTION_WEEKLY_PRICE_AMOUNT = "1 100 RON";
 export const INSCRIPTION_WEEKLY_PRICE_PERIOD = "/ copil / săptămână";
 export const INSCRIPTION_WEEKLY_PRICE_DISPLAY = `${INSCRIPTION_WEEKLY_PRICE_AMOUNT} ${INSCRIPTION_WEEKLY_PRICE_PERIOD}`;
-export const INSCRIPTION_SIBLING_DISCOUNT_LABEL = "Discount frați: 20%";
+export const INSCRIPTION_SIBLING_DISCOUNT_LABEL =
+  "Discount frați: 20% (pentru al doilea frate, discount aplicabil doar la tarif neredus)";
+
+/** Fișier în `public/` — notă de informare GDPR. */
+export const GDPR_INFORMATION_NOTICE_URL = "/nota-informare.pdf";

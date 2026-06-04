@@ -11,6 +11,7 @@ import {
   INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP,
   INSCRIPTION_SLOT_CAPACITY_PER_GROUP,
   INSCRIPTION_SLOT_FULL_MESSAGE,
+  GDPR_INFORMATION_NOTICE_URL,
   INSCRIPTION_SIBLING_DISCOUNT_LABEL,
   INSCRIPTION_WEEKLY_PRICE_AMOUNT,
   INSCRIPTION_WEEKLY_PRICE_PERIOD,
@@ -77,6 +78,10 @@ function scrollToFirstFieldError(errors: Partial<Record<InscriptionFieldKey, str
         document.getElementById("inscription-series-fieldset")?.scrollIntoView({ behavior: "smooth", block: "center" });
         return;
       }
+      if (field === "gdpr") {
+        document.getElementById("inscription-gdpr-consent")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
       const el = document.querySelector<HTMLElement>(`[name="${field}"]`);
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -98,15 +103,6 @@ function FieldError({ message }: { message?: string }) {
 
 const INSCRIPTION_SUCCESS_MESSAGE =
   "Cererea a fost trimisă. Veți fi contactat în curând pentru confirmare.";
-
-type ScheduleRow = {
-  interval: string;
-  day1: string;
-  day2: string;
-  day3: string;
-  day4: string;
-  day5: string;
-};
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -170,29 +166,6 @@ export default function Home() {
     });
     return () => cancelAnimationFrame(id);
   }, [formStatus]);
-
-  const schedule: ScheduleRow[] = [
-    { interval: "08:30 - 09:30", day1: "Sosire copii", day2: "Sosire copii", day3: "Sosire copii", day4: "Sosire copii", day5: "Sosire copii" },
-    { interval: "09:30 - 10:00", day1: "Warm-up și transfer", day2: "Warm-up și transfer", day3: "Warm-up și transfer", day4: "Warm-up și transfer", day5: "Warm-up și transfer" },
-    { interval: "10:00 - 11:00", day1: "Marea aventură a materialelor (Știința și Ingineria Materialelor)", day2: "Laboratorul viitorului (FIcBi)", day3: "Micii cercetători. Ce se ascunde în mâncarea noastră? Academia Micilor Brutari (ISB)", day4: "Magia electricității (IE)", day5: "Cum se mișcă lucrurile. Mecanisme inteligente (FIMM)" },
-    { interval: "11:00 - 11:20", day1: "Q&A + gustare (fruct)", day2: "Q&A + gustare (fruct)", day3: "Q&A + gustare (fruct)", day4: "Q&A + gustare (fruct)", day5: "Q&A + gustare (fruct)" },
-    { interval: "11:20 - 12:40", day1: "Punem lumea în mișcare - simulare circuit. Atelier activitate practică - Orașul inteligent (Transporturi)", day2: "Atelier construit avioane. Activitate practică - Lansare (FIA)", day3: "Unde a dispărut ecoul. Activitate practică în camera anecoică (ISB)", day4: "Puterea fulgerelor (Energetică)", day5: "Atelier robotică (FIIR)" },
-    { interval: "12:40 - 13:00", day1: "Transfer - plimbare prin campus", day2: "Transfer", day3: "Transfer - plimbare prin campus", day4: "Transfer - plimbare prin campus", day5: "Transfer - plimbare prin campus" },
-    { interval: "13:00 - 14:00", day1: "Prânz", day2: "Prânz", day3: "Prânz", day4: "Prânz", day5: "Prânz" },
-    { interval: "14:00 - 15:30", day1: "Atelier creativ - pictură", day2: "Atelier de improvizație teatrală", day3: "Atelier arheologie - Vânătorii de comori", day4: "Workshop Euronews - Micii reporteri", day5: "Workshop dezbateri - Avocat pentru o zi (Facultatea de Drept)" },
-    { interval: "15:30 - 16:15", day1: "Știința București - joc și mișcare", day2: "Știința București - joc și mișcare", day3: "Știința București - joc și mișcare", day4: "Știința București - joc și mișcare", day5: "Știința București - joc și mișcare" },
-    { interval: "16:15 - 16:30", day1: "Gustare și hidratare", day2: "Gustare și hidratare", day3: "Gustare și hidratare", day4: "Gustare și hidratare", day5: "Gustare și hidratare" },
-    { interval: "16:30 - 17:30", day1: "Jocuri distractive", day2: "Jocuri distractive", day3: "Jocuri distractive", day4: "Jocuri distractive", day5: "Jocuri distractive" },
-    { interval: "17:30 - 18:00", day1: "Preluare copii", day2: "Preluare copii", day3: "Preluare copii", day4: "Preluare copii", day5: "Preluare copii" },
-  ];
-
-  const dayPrograms = [
-    { title: "Ziua 1", key: "day1" as const, icon: Sparkles },
-    { title: "Ziua 2", key: "day2" as const, icon: Compass },
-    { title: "Ziua 3", key: "day3" as const, icon: Star },
-    { title: "Ziua 4", key: "day4" as const, icon: CalendarDays },
-    { title: "Ziua 5", key: "day5" as const, icon: Telescope },
-  ];
 
   async function handleInscriptionSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -510,9 +483,6 @@ export default function Home() {
               <span>Mese și materiale incluse</span>
             </div>
           </div>
-          <p className="muted">
-            Programul combină activități educaționale cu joacă și relaxare, într-un ritm echilibrat.
-          </p>
           <article className="tariffsCard" aria-labelledby="tarife-heading">
             <h3 id="tarife-heading">Tarife</h3>
             <p className="tariffsPrice">
@@ -522,32 +492,11 @@ export default function Home() {
               Tariful include: <strong>hrană</strong>, <strong>apă</strong>,{" "}
               <strong>materiale/rechizite</strong>, <strong>asistență medicală</strong>.
             </p>
-            <p className="tariffsDiscount">
-              <strong>{INSCRIPTION_SIBLING_DISCOUNT_LABEL}</strong>
-            </p>
+            <p className="tariffsDiscount">{INSCRIPTION_SIBLING_DISCOUNT_LABEL}</p>
           </article>
-          <div className="accordionGrid">
-            {dayPrograms.map((day, index) => {
-              const Icon = day.icon;
-              return (
-                <details key={day.key} className="dayAccordion" open={index === 0}>
-                  <summary>
-                    <span><Icon size={17} /> {day.title}</span>
-                  </summary>
-                  <div className="dayAccordionBody">
-                    <ul>
-                      {schedule.map((item) => (
-                        <li key={`${day.key}-${item.interval}`}>
-                          <span>{item.interval}</span>
-                          <p>{item[day.key]}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </details>
-              );
-            })}
-          </div>
+          <p className="programComingSoon">
+            Programul detaliat al activităților va fi actualizat în scurt timp.
+          </p>
         </section>
 
         <section id="inscriere" className="sectionCard">
@@ -572,8 +521,7 @@ export default function Home() {
                   Tarif tabără: <strong>{INSCRIPTION_WEEKLY_PRICE_AMOUNT}</strong> {INSCRIPTION_WEEKLY_PRICE_PERIOD}
                   <span className="signupFormPriceNoteDetail">
                     {" "}
-                    (include hrană, apă, materiale și asistență medicală;{" "}
-                    {INSCRIPTION_SIBLING_DISCOUNT_LABEL.toLowerCase()}).
+                    (include hrană, apă, materiale și asistență medicală; {INSCRIPTION_SIBLING_DISCOUNT_LABEL}).
                   </span>
                 </p>
               </div>
@@ -834,15 +782,33 @@ export default function Home() {
                   </label>
                 </fieldset>
 
-                <div className={`gdprRow ${fieldErrors.gdpr ? "fieldGroupInvalid" : ""}`}>
+                <div
+                  id="inscription-gdpr-consent"
+                  className={`gdprRow ${fieldErrors.gdpr ? "fieldGroupInvalid" : ""}`}
+                >
                   <label className="checkboxLabel gdprCheckboxLabel">
                     <input
                       type="checkbox"
                       name="gdpr"
                       aria-required="true"
                       aria-invalid={!!fieldErrors.gdpr}
+                      aria-describedby="gdpr-nota-informare-link"
                     />
-                    Sunt de acord cu prelucrarea datelor personale pentru înscrierea în tabără.
+                    <span>
+                      Confirm că am citit{" "}
+                      <a
+                        id="gdpr-nota-informare-link"
+                        href={GDPR_INFORMATION_NOTICE_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="gdprNoticeLink"
+                      >
+                        Nota de informare
+                      </a>{" "}
+                      privind prelucrarea datelor cu caracter personal și îmi dau consimțământul pentru
+                      înscrierea copilului în Taberele Micilor Ingineri, în conformitate cu Regulamentul (UE)
+                      2016/679 (GDPR).
+                    </span>
                   </label>
                   <FieldError message={fieldErrors.gdpr} />
                 </div>

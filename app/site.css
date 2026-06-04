@@ -988,6 +988,34 @@ a {
   align-items: flex-start;
 }
 
+.gdprCheckboxLabel span {
+  line-height: 1.55;
+}
+
+.gdprNoticeLink {
+  color: #2e57ac;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.gdprNoticeLink:hover {
+  color: #1e315f;
+}
+
+.programComingSoon {
+  margin: 1.25rem 0 0;
+  padding: 1.1rem 1.25rem;
+  border-radius: 14px;
+  border: 1px solid #cfe0ff;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+  color: #1e315f;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .appToasterToast {
   border-radius: 14px !important;
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif !important;
