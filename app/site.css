@@ -1336,6 +1336,102 @@ button[type="submit"]:hover {
 }
 
 /* FOOTER */
+.sponsorsSection {
+  width: min(1160px, 94%);
+  margin: 2.75rem auto 0;
+  padding: 2.75rem 1.5rem 3.25rem;
+  border-radius: 20px;
+  border: 1px solid #d7e0ef;
+  background: linear-gradient(180deg, #fafcff 0%, #f2f7ff 100%);
+  box-shadow: 0 14px 36px rgba(31, 56, 112, 0.06);
+}
+
+.sponsorsInner {
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.sponsorsOverline {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3f5ea8;
+}
+
+.sponsorsSection h2 {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.55rem, 3vw, 2rem);
+  color: #1e315f;
+}
+
+.sponsorsLead {
+  margin: 0 0 1.75rem;
+  color: #536685;
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+.sponsorsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.sponsorCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1.5rem 2rem 1.35rem;
+  border-radius: 18px;
+  border: 1px solid #cfe0ff;
+  background: #fff;
+  text-decoration: none;
+  color: #122647;
+  box-shadow: 0 10px 24px rgba(31, 56, 112, 0.08);
+  transition: transform 0.45s ease, box-shadow 0.45s ease, border-color 0.45s ease;
+}
+
+.sponsorCard:hover {
+  transform: translateY(-3px) scale(1.02);
+  border-color: #9eb8e8;
+  box-shadow: 0 16px 32px rgba(31, 56, 112, 0.12);
+}
+
+.sponsorLogoWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 5.5rem;
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+}
+
+.sponsorLogo {
+  width: auto;
+  max-width: 220px;
+  height: auto;
+  max-height: 88px;
+  object-fit: contain;
+}
+
+.sponsorName {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1e315f;
+}
+
+.sponsorLinkHint {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #3f5ea8;
+}
+
 .siteFooter {
   padding: 6.5rem 1.4rem 3.8rem;
   background: linear-gradient(135deg, #132955 0%, #1b4182 58%, #21529d 100%);
@@ -1745,6 +1841,17 @@ button[type="submit"]:hover {
     flex: 1 1 0;
     min-width: 0;
     min-height: 2.15rem;
+  }
+
+  .sponsorsSection {
+    margin-top: 2rem;
+    padding: 2rem 1rem 2.5rem;
+  }
+
+  .sponsorCard {
+    width: 100%;
+    max-width: 320px;
+    padding: 1.25rem 1.35rem 1.15rem;
   }
 
   .siteFooter {

@@ -363,6 +363,7 @@ export default function Home() {
             <a href="#activitati" onClick={() => setMenuOpen(false)}>Activități</a>
             <a href="#program" onClick={() => setMenuOpen(false)}>Program</a>
             <a href="#inscriere" onClick={() => setMenuOpen(false)}>Înscriere</a>
+            <a href="#sponsori" onClick={() => setMenuOpen(false)}>Sponsori</a>
             <a href="#locatie" onClick={() => setMenuOpen(false)}>Locație</a>
             <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
           </div>
@@ -846,6 +847,39 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="sponsori" className="sponsorsSection" aria-labelledby="sponsori-heading">
+          <div className="sponsorsInner">
+            <p className="sponsorsOverline">Parteneri</p>
+            <h2 id="sponsori-heading">Sponsori</h2>
+            <p className="sponsorsLead">
+              Taberele Micilor Ingineri sunt posibile și cu sprijinul partenerilor noștri.
+            </p>
+            <ul className="sponsorsList">
+              <li>
+                <a
+                  href="https://sanovita.ro"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="sponsorCard"
+                  aria-label="SanoVita — site partener (se deschide într-un tab nou)"
+                >
+                  <span className="sponsorLogoWrap">
+                    <Image
+                      src="/logo_sanovita.png"
+                      alt="Logo SanoVita"
+                      width={220}
+                      height={88}
+                      className="sponsorLogo"
+                    />
+                  </span>
+                  <span className="sponsorName">SanoVita</span>
+                  <span className="sponsorLinkHint">sanovita.ro</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </section>
+
         <section id="locatie" className="sectionCard">
           <div className="sectionHeaderRow">
             <h2>Locație</h2>
@@ -889,10 +923,13 @@ export default function Home() {
             <a href="#activitati">Activități</a>
             <a href="#program">Program și tarife</a>
             <a href="#inscriere">Înscriere</a>
+            <a href="#sponsori">Sponsori</a>
+            <a href="#locatie">Locație</a>
           </div>
 
           <div className="footerColumn">
             <h3>Acces rapid</h3>
+            <a href="#sponsori">Sponsori</a>
             <a href="#locatie">Locație</a>
             <a href="#contact">Contact</a>
             <a href="#intro">Înapoi sus</a>
