@@ -11,8 +11,22 @@ export const INSCRIPTION_AGE_CATEGORIES = ["5-7 ani", "7-9 ani", "9-11 ani"] as 
 
 export type InscriptionAgeCategory = (typeof INSCRIPTION_AGE_CATEGORIES)[number];
 
-/** Locuri confirmate (status „Înscris”) per grupă de vârstă și perioadă. */
+/** Locuri confirmate implicite (status „Înscris”) per grupă de vârstă și perioadă. */
 export const INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP = 25;
+
+/** Grupuri cu limită redusă (ex. sesiuni încă necompletate). De la locul N+1 → listă de așteptare. */
+export const INSCRIPTION_CONFIRMED_SLOTS_OVERRIDES: Partial<
+  Record<InscriptionAgeCategory, number>
+> = {
+  "5-7 ani": 23,
+};
+
+export function getConfirmedSlotsForAgeCategory(ageCategory: string): number {
+  return (
+    INSCRIPTION_CONFIRMED_SLOTS_OVERRIDES[ageCategory as InscriptionAgeCategory] ??
+    INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP
+  );
+}
 
 /** Maxim înscrieri acceptate în total (inclusiv listă de așteptare) per grupă / perioadă. */
 export const INSCRIPTION_SLOT_CAPACITY_PER_GROUP = 40;

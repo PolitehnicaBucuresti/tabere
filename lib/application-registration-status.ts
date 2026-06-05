@@ -1,5 +1,5 @@
 import type { Application } from "@prisma/client";
-import { INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP } from "@/lib/inscription-constants";
+import { getConfirmedSlotsForAgeCategory } from "@/lib/inscription-constants";
 
 export const REGISTRATION_STATUS_CONFIRMED = "Înscris";
 export const REGISTRATION_STATUS_WAITLIST = "Listă de așteptare";
@@ -13,9 +13,9 @@ export function registrationStatusLabel(waitlisted: boolean): string {
   return waitlisted ? REGISTRATION_STATUS_WAITLIST : REGISTRATION_STATUS_CONFIRMED;
 }
 
-/** Poziția 1–25 = înscris; de la 26 = listă de așteptare. */
-export function isWaitlistedBySlotRank(rankOneBased: number): boolean {
-  return rankOneBased > INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP;
+/** Peste limita confirmată pentru grupă = listă de așteptare (ex. 5–7 ani: 24+). */
+export function isWaitlistedBySlotRank(rankOneBased: number, ageCategory: string): boolean {
+  return rankOneBased > getConfirmedSlotsForAgeCategory(ageCategory);
 }
 
 /**
@@ -49,7 +49,7 @@ export function resolveRegistrationStatus(
 ): string {
   const rank = rankById.get(app.id);
   if (rank !== undefined) {
-    return registrationStatusLabel(isWaitlistedBySlotRank(rank));
+    return registrationStatusLabel(isWaitlistedBySlotRank(rank, app.ageCategory));
   }
   return registrationStatusLabel(app.waitlisted);
 }

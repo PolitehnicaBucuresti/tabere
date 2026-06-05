@@ -296,6 +296,84 @@ function getAdminEmailHtml(data: InscriptionPayload, registrationStatus: string)
   `;
 }
 
+function getParentWaitlistHtml(): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Listă de așteptare - Taberele Micilor Ingineri</title>
+      <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f4f7fc;
+          color: #122647;
+          margin: 0;
+          padding: 0;
+        }
+        .container {
+          max-width: 600px;
+          margin: 20px auto;
+          background-color: #ffffff;
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 8px 30px rgba(31, 56, 112, 0.08);
+          border: 1px solid #d7e0ef;
+        }
+        .header {
+          background: linear-gradient(135deg, #2e4d8d 0%, #3f5ea8 100%);
+          padding: 40px 25px;
+          text-align: center;
+          color: #ffffff;
+        }
+        .header h1 { margin: 0; font-size: 26px; font-weight: 800; }
+        .content {
+          padding: 30px 25px;
+          line-height: 1.65;
+          font-size: 15px;
+          color: #536685;
+        }
+        .content p { margin: 0 0 1rem; }
+        .content .greeting { font-weight: 700; color: #1e315f; font-size: 16px; }
+        .content .signoff { margin-top: 1.5rem; color: #122647; }
+        .footer {
+          background-color: #eef3fb;
+          padding: 25px 20px;
+          text-align: center;
+          font-size: 12px;
+          color: #536685;
+          border-top: 1px solid #d7e0ef;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Taberele Micilor Ingineri</h1>
+        </div>
+        <div class="content">
+          <p class="greeting">Dragul nostru părinte de mic inginer,</p>
+          <p>
+            Îți mulțumim pentru interesul acordat taberelor urbane organizate de POLITEHNICA București. În acest moment
+            toate locurile pentru categoria de vârstă și săptămâna selectată sunt ocupate. Înscrierea ta a intrat pe o
+            listă scurtă de așteptare și te vom contacta în cel mai scurt timp pentru detalii.
+          </p>
+          <p class="signoff">
+            Zi frumoasă și cu spor!<br />
+            Numai bine,<br />
+            Echipa POLITEHNICA București
+          </p>
+        </div>
+        <div class="footer">
+          <p>&copy; ${new Date().getFullYear()} Universitatea Națională de Științe și Tehnologie POLITEHNICA București</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
 /**
  * Generate a beautifully styled, premium HTML confirmation email for the parent.
  */
@@ -643,8 +721,10 @@ export async function sendInscriptionEmails(
     const parentMailOptions = {
       from: `"Taberele Micilor Ingineri" <${smtpFrom}>`,
       to: data.email,
-      subject: `Înscriere înregistrată - Taberele Micilor Ingineri (${safeChildName})`,
-      html: getParentConfirmationHtml(data),
+      subject: options.waitlisted
+        ? `Listă de așteptare - Taberele Micilor Ingineri (${safeChildName})`
+        : `Înscriere înregistrată - Taberele Micilor Ingineri (${safeChildName})`,
+      html: options.waitlisted ? getParentWaitlistHtml() : getParentConfirmationHtml(data),
     };
 
     // Sequential delivery — some relays reject parallel MAIL FROM on one connection.

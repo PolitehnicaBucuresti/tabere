@@ -8,6 +8,7 @@ import {
   type InscriptionAgeCategory,
   INSCRIPTION_AGE_CATEGORIES,
   INSCRIPTION_SERIES_OPTIONS,
+  getConfirmedSlotsForAgeCategory,
   INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP,
   INSCRIPTION_SLOT_CAPACITY_PER_GROUP,
   INSCRIPTION_SLOT_FULL_MESSAGE,
@@ -509,8 +510,9 @@ export default function Home() {
             <div className="signupFormPanel">
               <div className="signupFormIntro">
                 <p className="signupCapacityBanner">
-                  Fiecare grupă de vârstă: <strong>{INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP}</strong> locuri
-                  confirmate / perioadă; până la{" "}
+                  Locuri confirmate / perioadă:{" "}
+                  <strong>{getConfirmedSlotsForAgeCategory("5-7 ani")}</strong> (grupa 5–7 ani),{" "}
+                  <strong>{INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP}</strong> (grupele 7–9 și 9–11 ani); până la{" "}
                   <strong>{INSCRIPTION_SLOT_CAPACITY_PER_GROUP}</strong> înscrieri în total (inclusiv listă de
                   așteptare){" "}
                   <span className="signupCapacityBannerSub">
