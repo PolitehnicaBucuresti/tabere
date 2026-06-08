@@ -35,6 +35,21 @@ export const INSCRIPTION_SLOT_CAPACITY_PER_GROUP = 40;
 export const INSCRIPTION_SLOT_FULL_MESSAGE =
   "Ne pare rău, pentru grupa de vârstă și perioada aleasă s-a atins numărul maxim de înscrieri.";
 
+/** Singura grupă de vârstă cu înscrieri deschise în formularul public. */
+export const INSCRIPTION_PUBLIC_OPEN_AGE_CATEGORY: InscriptionAgeCategory = "5-7 ani";
+
+/** Săptămânile deschise pentru înscriere publică (5–7 ani). */
+export const INSCRIPTION_PUBLIC_OPEN_SERIES: readonly InscriptionSeries[] = [
+  INSCRIPTION_SERIES_OPTIONS[1],
+  INSCRIPTION_SERIES_OPTIONS[2],
+  INSCRIPTION_SERIES_OPTIONS[3],
+];
+
+export function isPublicInscriptionSlotOpen(ageCategory: string, series: string): boolean {
+  if (ageCategory !== INSCRIPTION_PUBLIC_OPEN_AGE_CATEGORY) return false;
+  return (INSCRIPTION_PUBLIC_OPEN_SERIES as readonly string[]).includes(series);
+}
+
 /** Tarif afișat în formular și secțiunea „Program și tarife”. */
 export const INSCRIPTION_WEEKLY_PRICE_AMOUNT = "1 100 RON";
 export const INSCRIPTION_WEEKLY_PRICE_PERIOD = "/ copil / săptămână";

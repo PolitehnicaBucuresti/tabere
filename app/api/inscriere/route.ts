@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { inscriptionPayloadSchema } from "@/lib/inscription-schema";
 import { sendInscriptionEmails } from "@/lib/email";
 import { createInscriptionApplication } from "@/lib/inscription-capacity";
-import { INSCRIPTION_SLOT_FULL_MESSAGE } from "@/lib/inscription-constants";
+import {
+  INSCRIPTION_SLOT_FULL_MESSAGE,
+  isPublicInscriptionSlotOpen,
+} from "@/lib/inscription-constants";
 import { isStrictOriginAllowed } from "@/lib/inscriere-http-allow";
 
 function isOriginAllowed(request: NextRequest): boolean {
@@ -46,6 +49,17 @@ export async function POST(request: NextRequest) {
   }
 
   const d = parsed.data;
+
+  if (!isPublicInscriptionSlotOpen(d.ageCategory, d.series)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: INSCRIPTION_SLOT_FULL_MESSAGE,
+        code: "SLOT_FULL",
+      },
+      { status: 409 },
+    );
+  }
 
   try {
     const saved = await createInscriptionApplication(d);

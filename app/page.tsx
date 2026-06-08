@@ -10,8 +10,11 @@ import {
   INSCRIPTION_SERIES_OPTIONS,
   getConfirmedSlotsForAgeCategory,
   INSCRIPTION_CONFIRMED_SLOTS_PER_GROUP,
+  INSCRIPTION_PUBLIC_OPEN_AGE_CATEGORY,
+  INSCRIPTION_PUBLIC_OPEN_SERIES,
   INSCRIPTION_SLOT_CAPACITY_PER_GROUP,
   INSCRIPTION_SLOT_FULL_MESSAGE,
+  isPublicInscriptionSlotOpen,
   GDPR_INFORMATION_NOTICE_URL,
   INSCRIPTION_SIBLING_DISCOUNT_LABEL,
   INSCRIPTION_WEEKLY_PRICE_AMOUNT,
@@ -19,8 +22,7 @@ import {
 } from "@/lib/inscription-constants";
 import { inscriptionPayloadSchema, type InscriptionPayload } from "@/lib/inscription-schema";
 import {
-  ageCategoryFullyBooked,
-  allProgramSlotsFull,
+  firstAvailablePublicSeries,
   isSeriesAgeFull,
   type SlotCountMap,
 } from "@/lib/inscription-slot-helpers";
@@ -107,7 +109,12 @@ const INSCRIPTION_SUCCESS_MESSAGE =
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [selectedAgeCategory, setSelectedAgeCategory] = useState<InscriptionAgeCategory>(INSCRIPTION_AGE_CATEGORIES[0]);
+  const [selectedAgeCategory, setSelectedAgeCategory] = useState<InscriptionAgeCategory>(
+    INSCRIPTION_PUBLIC_OPEN_AGE_CATEGORY,
+  );
+  const [selectedSeries, setSelectedSeries] = useState<(typeof INSCRIPTION_SERIES_OPTIONS)[number]>(
+    INSCRIPTION_PUBLIC_OPEN_SERIES[0],
+  );
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [formError, setFormError] = useState<string | null>(null);
   const [smtpDiag, setSmtpDiag] = useState<string | null>(null);
@@ -150,15 +157,6 @@ export default function Home() {
     document.addEventListener("visibilitychange", onVis);
     return () => document.removeEventListener("visibilitychange", onVis);
   }, [loadCapacity]);
-
-  useEffect(() => {
-    if (!capacityPayload) return;
-    setSelectedAgeCategory((prev) =>
-      ageCategoryFullyBooked(capacityPayload.slots, prev)
-        ? (INSCRIPTION_AGE_CATEGORIES.find((c) => !ageCategoryFullyBooked(capacityPayload.slots, c)) ?? prev)
-        : prev,
-    );
-  }, [capacityPayload]);
 
   useEffect(() => {
     if (formStatus !== "success") return;
@@ -215,6 +213,13 @@ export default function Home() {
       setFormStatus("idle");
       toast.warning("Verifică câmpurile marcate mai jos.");
       scrollToFirstFieldError(fe);
+      return;
+    }
+
+    if (!isPublicInscriptionSlotOpen(validated.data.ageCategory, validated.data.series)) {
+      setFormStatus("idle");
+      setFormError(INSCRIPTION_SLOT_FULL_MESSAGE);
+      toast.error(INSCRIPTION_SLOT_FULL_MESSAGE);
       return;
     }
 
@@ -280,13 +285,10 @@ export default function Home() {
       setSmtpDiag(null);
       setFormStatus("success");
       formEl.reset();
-      const avail =
-        capacityPayload?.slots != null
-          ? (INSCRIPTION_AGE_CATEGORIES.find(
-              (c) => !ageCategoryFullyBooked(capacityPayload.slots, c),
-            ) ?? INSCRIPTION_AGE_CATEGORIES[0])
-          : INSCRIPTION_AGE_CATEGORIES[0];
-      setSelectedAgeCategory(avail);
+      setSelectedAgeCategory(INSCRIPTION_PUBLIC_OPEN_AGE_CATEGORY);
+      if (capacityPayload?.slots != null) {
+        setSelectedSeries(firstAvailablePublicSeries(capacityPayload.slots));
+      }
       void loadCapacity();
     } catch (err) {
       setFormStatus("error");
@@ -320,16 +322,11 @@ export default function Home() {
   }
 
   const inscriptionSlots = capacityPayload?.slots ?? null;
-  const chosenAgeHasNoWeeks =
-    !!inscriptionSlots &&
-    INSCRIPTION_SERIES_OPTIONS.every((s) =>
-      isSeriesAgeFull(inscriptionSlots, s, selectedAgeCategory),
-    );
-  const inscriptionSubmitDisabled =
-    formStatus === "submitting" ||
-    capacityLoading ||
-    (inscriptionSlots !== null && allProgramSlotsFull(inscriptionSlots)) ||
-    chosenAgeHasNoWeeks;
+  const slotPubliclyOpen = isPublicInscriptionSlotOpen(selectedAgeCategory, selectedSeries);
+  const slotCapacityFull =
+    !!inscriptionSlots && isSeriesAgeFull(inscriptionSlots, selectedSeries, selectedAgeCategory);
+  const showInscriptionForm = slotPubliclyOpen && !slotCapacityFull && !capacityLoading;
+  const inscriptionSubmitDisabled = formStatus === "submitting" || !showInscriptionForm;
 
   return (
     <div className="siteWrap">
@@ -529,50 +526,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <form
-                className="signupForm"
-                noValidate
-                onSubmit={handleInscriptionSubmit}
-                onInput={(e) => clearFieldErrorFromTarget(e.target)}
-              >
-                <div className="inscriptionHoneypotWrap" aria-hidden="true">
-                  <label>
-                    Website organizație
-                    <input
-                      type="text"
-                      name="organizationWebsite"
-                      tabIndex={-1}
-                      autoComplete="off"
-                      defaultValue=""
-                    />
-                  </label>
-                </div>
-
-                <div className="signupFormStatusRegion" aria-live="polite">
-                  {formStatus === "submitting" ? (
-                    <p className="signupFormStatus signupFormStatusNeutral">Se trimite cererea...</p>
-                  ) : null}
-                  {formStatus === "success" ? (
-                    <p
-                      ref={feedbackRef}
-                      tabIndex={-1}
-                      className="signupFormStatus signupFormStatusSuccess"
-                    >
-                      {INSCRIPTION_SUCCESS_MESSAGE}
-                    </p>
-                  ) : null}
-                  {formStatus === "error" && formError ? (
-                    <div className="signupFormErrorStack">
-                      <p className="signupFormStatus signupFormStatusError">{formError}</p>
-                      {smtpDiag ? (
-                        <p className="signupFormSmtpDetail" role="status">
-                          {smtpDiag}
-                        </p>
-                      ) : null}
-                    </div>
-                  ) : null}
-                </div>
-
+              <div className="signupFormControls">
                 <div
                   id="inscription-age-tabs"
                   className={`ageTabs ${fieldErrors.ageCategory ? "fieldGroupInvalid" : ""}`}
@@ -580,10 +534,7 @@ export default function Home() {
                   aria-label="Categorie de vârstă pentru înscriere"
                 >
                   {INSCRIPTION_AGE_CATEGORIES.map((category) => {
-                    const booked =
-                      !capacityLoading &&
-                      inscriptionSlots !== null &&
-                      ageCategoryFullyBooked(inscriptionSlots, category);
+                    const policyClosed = category !== INSCRIPTION_PUBLIC_OPEN_AGE_CATEGORY;
                     return (
                       <button
                         key={category}
@@ -591,14 +542,15 @@ export default function Home() {
                         role="tab"
                         className={`ageTab ${selectedAgeCategory === category ? "isActive" : ""}`}
                         aria-selected={selectedAgeCategory === category}
-                        disabled={booked}
-                        title={
-                          booked
-                            ? "Toate perioadele sunt complete pentru această grupă de vârstă."
-                            : undefined
-                        }
                         onClick={() => {
                           setSelectedAgeCategory(category);
+                          if (category === INSCRIPTION_PUBLIC_OPEN_AGE_CATEGORY) {
+                            setSelectedSeries(
+                              inscriptionSlots
+                                ? firstAvailablePublicSeries(inscriptionSlots)
+                                : INSCRIPTION_PUBLIC_OPEN_SERIES[0],
+                            );
+                          }
                           setFieldErrors((prev) => {
                             if (!prev.ageCategory) return prev;
                             const next = { ...prev };
@@ -608,10 +560,10 @@ export default function Home() {
                         }}
                       >
                         {category}
-                        {booked ? (
+                        {policyClosed ? (
                           <span className="ageTabBadge" aria-hidden="true">
                             {" "}
-                            complet
+                            închis
                           </span>
                         ) : null}
                       </button>
@@ -619,9 +571,108 @@ export default function Home() {
                   })}
                 </div>
                 <FieldError message={fieldErrors.ageCategory} />
-                <input type="hidden" name="ageCategory" value={selectedAgeCategory} />
 
-                <fieldset>
+                {selectedAgeCategory === INSCRIPTION_PUBLIC_OPEN_AGE_CATEGORY ? (
+                  <fieldset
+                    id="inscription-series-fieldset"
+                    className={`signupSeriesFieldset ${fieldErrors.series ? "fieldsetHasError" : undefined}`}
+                    aria-required="true"
+                  >
+                    <legend>Alegerea programului</legend>
+                    {INSCRIPTION_SERIES_OPTIONS.map((option) => {
+                      const policyClosed = !isPublicInscriptionSlotOpen(selectedAgeCategory, option);
+                      const full =
+                        !policyClosed &&
+                        !!inscriptionSlots &&
+                        isSeriesAgeFull(inscriptionSlots, option, selectedAgeCategory);
+                      const disabled = policyClosed || full;
+                      return (
+                        <label
+                          key={option}
+                          className={`checkboxLabel radioLabel ${disabled ? "radioLabelDisabled" : ""}`}
+                        >
+                          <input
+                            type="radio"
+                            name="series-choice"
+                            value={option}
+                            checked={selectedSeries === option}
+                            disabled={disabled}
+                            onChange={() => {
+                              setSelectedSeries(option);
+                              setFieldErrors((prev) => {
+                                if (!prev.series) return prev;
+                                const next = { ...prev };
+                                delete next.series;
+                                return next;
+                              });
+                            }}
+                          />
+                          {option}
+                        </label>
+                      );
+                    })}
+                    <FieldError message={fieldErrors.series} />
+                  </fieldset>
+                ) : null}
+              </div>
+
+              <div
+                key={`${selectedAgeCategory}-${selectedSeries}-${showInscriptionForm ? "open" : "closed"}`}
+                className="signupFormSwap"
+              >
+                {capacityLoading ? (
+                  <p className="signupCapacityLoading" role="status">
+                    Verificăm disponibilitatea locurilor…
+                  </p>
+                ) : showInscriptionForm ? (
+                  <form
+                    className="signupForm signupFormReveal"
+                    noValidate
+                    onSubmit={handleInscriptionSubmit}
+                    onInput={(e) => clearFieldErrorFromTarget(e.target)}
+                  >
+                    <div className="inscriptionHoneypotWrap" aria-hidden="true">
+                      <label>
+                        Website organizație
+                        <input
+                          type="text"
+                          name="organizationWebsite"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          defaultValue=""
+                        />
+                      </label>
+                    </div>
+
+                    <div className="signupFormStatusRegion" aria-live="polite">
+                      {formStatus === "submitting" ? (
+                        <p className="signupFormStatus signupFormStatusNeutral">Se trimite cererea...</p>
+                      ) : null}
+                      {formStatus === "success" ? (
+                        <p
+                          ref={feedbackRef}
+                          tabIndex={-1}
+                          className="signupFormStatus signupFormStatusSuccess"
+                        >
+                          {INSCRIPTION_SUCCESS_MESSAGE}
+                        </p>
+                      ) : null}
+                      {formStatus === "error" && formError ? (
+                        <div className="signupFormErrorStack">
+                          <p className="signupFormStatus signupFormStatusError">{formError}</p>
+                          {smtpDiag ? (
+                            <p className="signupFormSmtpDetail" role="status">
+                              {smtpDiag}
+                            </p>
+                          ) : null}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <input type="hidden" name="ageCategory" value={selectedAgeCategory} />
+                    <input type="hidden" name="series" value={selectedSeries} />
+
+                    <fieldset>
                   <legend>Date părinte</legend>
                   <label className="signupFieldLabel">
                     <span className="signupFieldLabelText">Nume și prenume părinte</span>
@@ -701,30 +752,6 @@ export default function Home() {
                     />
                     <FieldError message={fieldErrors.school} />
                   </label>
-                </fieldset>
-
-                <fieldset
-                  key={selectedAgeCategory}
-                  id="inscription-series-fieldset"
-                  className={fieldErrors.series ? "fieldsetHasError" : undefined}
-                  aria-required="true"
-                >
-                  <legend>Alegerea programului</legend>
-                  {INSCRIPTION_SERIES_OPTIONS.map((option) => {
-                    const full =
-                      !!inscriptionSlots &&
-                      isSeriesAgeFull(inscriptionSlots, option, selectedAgeCategory);
-                    return (
-                      <label
-                        key={option}
-                        className={`checkboxLabel radioLabel ${full ? "radioLabelDisabled" : ""}`}
-                      >
-                        <input type="radio" name="series" value={option} disabled={full} />
-                        {option}
-                      </label>
-                    );
-                  })}
-                  <FieldError message={fieldErrors.series} />
                 </fieldset>
 
                 <fieldset>
@@ -816,14 +843,20 @@ export default function Home() {
                   <FieldError message={fieldErrors.gdpr} />
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={inscriptionSubmitDisabled}
-                  aria-busy={formStatus === "submitting"}
-                >
-                  Înscrie copilul
-                </button>
-              </form>
+                    <button
+                      type="submit"
+                      disabled={inscriptionSubmitDisabled}
+                      aria-busy={formStatus === "submitting"}
+                    >
+                      Înscrie copilul
+                    </button>
+                  </form>
+                ) : (
+                  <p className="signupCapacityFull signupFormReveal" role="alert">
+                    {INSCRIPTION_SLOT_FULL_MESSAGE}
+                  </p>
+                )}
+              </div>
             </div>
 
             <aside className="signupInfo signupInfoPanel">
