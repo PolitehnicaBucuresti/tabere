@@ -533,9 +533,7 @@ export default function Home() {
                   role="tablist"
                   aria-label="Categorie de vârstă pentru înscriere"
                 >
-                  {INSCRIPTION_AGE_CATEGORIES.map((category) => {
-                    const policyClosed = category !== INSCRIPTION_PUBLIC_OPEN_AGE_CATEGORY;
-                    return (
+                  {INSCRIPTION_AGE_CATEGORIES.map((category) => (
                       <button
                         key={category}
                         type="button"
@@ -560,15 +558,8 @@ export default function Home() {
                         }}
                       >
                         {category}
-                        {policyClosed ? (
-                          <span className="ageTabBadge" aria-hidden="true">
-                            {" "}
-                            închis
-                          </span>
-                        ) : null}
                       </button>
-                    );
-                  })}
+                    ))}
                 </div>
                 <FieldError message={fieldErrors.ageCategory} />
 
