@@ -38,9 +38,8 @@ export const INSCRIPTION_SLOT_FULL_MESSAGE =
 /** Singura grupă de vârstă cu înscrieri deschise în formularul public. */
 export const INSCRIPTION_PUBLIC_OPEN_AGE_CATEGORY: InscriptionAgeCategory = "5-7 ani";
 
-/** Săptămânile deschise pentru înscriere publică (5–7 ani). */
+/** Săptămânile deschise pentru înscriere publică (5–7 ani): ultimele 2 perioade. */
 export const INSCRIPTION_PUBLIC_OPEN_SERIES: readonly InscriptionSeries[] = [
-  INSCRIPTION_SERIES_OPTIONS[1],
   INSCRIPTION_SERIES_OPTIONS[2],
   INSCRIPTION_SERIES_OPTIONS[3],
 ];

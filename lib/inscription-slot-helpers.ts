@@ -27,7 +27,7 @@ export function allProgramSlotsFull(slots: SlotCountMap | null): boolean {
   );
 }
 
-/** True dacă toate sloturile deschise public (5–7, săpt. 2–4) sunt la capacitate. */
+/** True dacă toate sloturile deschise public (5–7, ultimele 2 săptămâni) sunt la capacitate. */
 export function allPublicOpenSlotsFull(slots: SlotCountMap | null): boolean {
   if (!slots) return false;
   return INSCRIPTION_PUBLIC_OPEN_SERIES.every((series) =>
