@@ -1004,7 +1004,7 @@ a {
 }
 
 .programComingSoon {
-  margin: 1.25rem 0 0;
+  margin: 0;
   padding: 1.1rem 1.25rem;
   border-radius: 14px;
   border: 1px solid #cfe0ff;
@@ -1014,6 +1014,19 @@ a {
   font-weight: 600;
   line-height: 1.5;
   text-align: center;
+}
+
+.inscriptionClosedNotice {
+  margin: 0;
+  max-width: 52rem;
+  padding: 1.35rem 1.5rem;
+  border-radius: 14px;
+  border: 1px solid rgba(220, 60, 60, 0.22);
+  background: linear-gradient(180deg, #fff8f6 0%, #fff1ec 100%);
+  color: #5c2a24;
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.65;
 }
 
 .appToasterToast {

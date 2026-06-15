@@ -3,6 +3,8 @@ import { inscriptionPayloadSchema } from "@/lib/inscription-schema";
 import { sendInscriptionEmails } from "@/lib/email";
 import { createInscriptionApplication } from "@/lib/inscription-capacity";
 import {
+  INSCRIPTION_CLOSED_MESSAGE,
+  INSCRIPTIONS_PUBLICLY_CLOSED,
   INSCRIPTION_SLOT_FULL_MESSAGE,
   isPublicInscriptionSlotOpen,
 } from "@/lib/inscription-constants";
@@ -41,6 +43,17 @@ export async function POST(request: NextRequest) {
 
   if (honeypotTriggered(body)) {
     return NextResponse.json({ ok: true });
+  }
+
+  if (INSCRIPTIONS_PUBLICLY_CLOSED) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: INSCRIPTION_CLOSED_MESSAGE,
+        code: "INSCRIPTIONS_CLOSED",
+      },
+      { status: 409 },
+    );
   }
 
   const parsed = inscriptionPayloadSchema.safeParse(body);

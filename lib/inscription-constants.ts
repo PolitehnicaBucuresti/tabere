@@ -31,6 +31,12 @@ export function getConfirmedSlotsForAgeCategory(ageCategory: string): number {
 /** Maxim înscrieri acceptate în total (inclusiv listă de așteptare) per grupă / perioadă. */
 export const INSCRIPTION_SLOT_CAPACITY_PER_GROUP = 40;
 
+/** Înscrieri publice închise pentru ediția curentă. */
+export const INSCRIPTIONS_PUBLICLY_CLOSED = true;
+
+export const INSCRIPTION_CLOSED_MESSAGE =
+  "Pentru perioada 22 iunie-17 iulie 2026 nu mai acceptăm înscrieri. Vă mulțumim pentru înțelegere și vă așteptăm la următoarea ediție a Taberelor Micilor Ingineri.";
+
 /** Mesaj afișat când combinația grupă + perioadă este completă. */
 export const INSCRIPTION_SLOT_FULL_MESSAGE =
   "Ne pare rău, pentru grupa de vârstă și perioada aleasă s-a atins numărul maxim de înscrieri.";
