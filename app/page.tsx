@@ -4,6 +4,11 @@ import Image from "next/image";
 import { useState } from "react";
 import { INSCRIPTION_CLOSED_MESSAGE } from "@/lib/inscription-constants";
 import {
+  PROGRAM_AGE_GROUPS,
+  PROGRAM_DAYS,
+  type ProgramAgeGroupKey,
+} from "@/lib/program-schedule";
+import {
   Clock3,
   Compass,
   Mail,
@@ -16,6 +21,7 @@ import MouseAura from "./components/MouseAura";
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedProgramAgeGroup, setSelectedProgramAgeGroup] = useState<ProgramAgeGroupKey>("5-7");
   const currentYear = new Date().getFullYear();
 
   return (
@@ -166,10 +172,58 @@ export default function Home() {
         <section id="program" className="sectionCard">
           <div className="sectionHeaderRow">
             <h2>Program</h2>
+            <div className="pillRow">
+              <span>08:30 - 18:00</span>
+              <span>5 zile</span>
+              <span>Mese și materiale incluse</span>
+            </div>
           </div>
-          <p className="programComingSoon">
-            Programul activităților va fi actualizat în scurt timp.
+          <p className="muted programIntro">
+            Program săptămânal — alege grupa de vârstă pentru a vedea activitățile zilnice.
           </p>
+          <div
+            className="ageTabs programAgeTabs"
+            role="tablist"
+            aria-label="Grupă de vârstă pentru program"
+          >
+            {PROGRAM_AGE_GROUPS.map((group) => (
+              <button
+                key={group.key}
+                type="button"
+                role="tab"
+                className={`ageTab ${selectedProgramAgeGroup === group.key ? "isActive" : ""}`}
+                aria-selected={selectedProgramAgeGroup === group.key}
+                onClick={() => setSelectedProgramAgeGroup(group.key)}
+              >
+                {group.label}
+              </button>
+            ))}
+          </div>
+          <div className="accordionGrid">
+            {PROGRAM_DAYS.map((day, index) => {
+              const Icon = day.icon;
+              const slots = day.schedules[selectedProgramAgeGroup];
+              return (
+                <details key={day.key} className="dayAccordion" open={index === 0}>
+                  <summary>
+                    <span>
+                      <Icon size={17} /> {day.title}
+                    </span>
+                  </summary>
+                  <div className="dayAccordionBody">
+                    <ul>
+                      {slots.map((slot) => (
+                        <li key={`${day.key}-${slot.interval}`}>
+                          <span>{slot.interval}</span>
+                          <p>{slot.activity}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </details>
+              );
+            })}
+          </div>
         </section>
 
         <section id="inscriere" className="sectionCard">

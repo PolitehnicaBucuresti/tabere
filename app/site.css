@@ -771,6 +771,14 @@ a {
   gap: 0.72rem;
 }
 
+.programIntro {
+  margin-bottom: 1rem;
+}
+
+.programAgeTabs {
+  margin-bottom: 1rem;
+}
+
 .dayAccordion {
   border-radius: 14px;
   overflow: hidden;
@@ -864,6 +872,7 @@ a {
   color: #4b6192;
   font-size: 1.1rem;
   line-height: 1.45;
+  white-space: pre-line;
 }
 
 .signupLayout {
