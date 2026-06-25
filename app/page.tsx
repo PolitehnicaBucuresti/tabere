@@ -56,6 +56,7 @@ export default function Home() {
             <a href="#despre" onClick={() => setMenuOpen(false)}>Despre</a>
             <a href="#activitati" onClick={() => setMenuOpen(false)}>Activități</a>
             <a href="#program" onClick={() => setMenuOpen(false)}>Program</a>
+            <a href="/Meniu_tabere.pdf" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}>Meniu</a>
             <a href="#inscriere" onClick={() => setMenuOpen(false)}>Înscriere</a>
             <a href="#sponsori" onClick={() => setMenuOpen(false)}>Sponsori</a>
             <a href="#locatie" onClick={() => setMenuOpen(false)}>Locație</a>
@@ -310,6 +311,7 @@ export default function Home() {
             <a href="#despre">Despre</a>
             <a href="#activitati">Activități</a>
             <a href="#program">Program</a>
+            <a href="/Meniu_tabere.pdf" target="_blank" rel="noopener noreferrer">Meniu</a>
             <a href="#inscriere">Înscriere</a>
             <a href="#sponsori">Sponsori</a>
             <a href="#locatie">Locație</a>
