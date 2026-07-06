@@ -775,6 +775,28 @@ a {
   margin-bottom: 1rem;
 }
 
+.programDownloadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+  padding: 0.72rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid #c5d8ff;
+  background: linear-gradient(180deg, #ffffff 0%, #f3f8ff 100%);
+  color: #1f4186;
+  font-size: 0.98rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.programDownloadBtn:hover {
+  transform: translateY(-1px);
+  border-color: #9ebef5;
+  box-shadow: 0 10px 20px rgba(43, 73, 151, 0.12);
+}
+
 .programAgeTabs {
   margin-bottom: 1rem;
 }

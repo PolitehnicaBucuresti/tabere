@@ -21,6 +21,9 @@ export type ProgramDay = {
   schedules: Record<ProgramAgeGroupKey, ProgramTimeSlot[]>;
 };
 
+export const PROGRAM_DOWNLOAD_FILE = "/program-tabere-saptamana-3.jpeg";
+export const PROGRAM_DOWNLOAD_LABEL = "Descarcă programul (JPEG)";
+
 export const PROGRAM_DAYS: ProgramDay[] = [
   {
     title: "Ziua 1",
@@ -34,7 +37,7 @@ export const PROGRAM_DAYS: ProgramDay[] = [
       { interval: "10.30 – 12:00", activity: "Experimente chimice\nFacultatea de Inginerie Chimică și Biotehnologii" },
       { interval: "12:00 – 13:00", activity: "Plastilină\nBubble station\nTraseu motric\nMud kitchen\nCentru LEGO mic/mare" },
       { interval: "13:00 – 14:00", activity: "Prânz" },
-      { interval: "14:00 – 15:30", activity: "Activități coordonate de Facultatea de Energetică" },
+      { interval: "14:00 – 15:30", activity: "Activități coordonate de Facultatea de Inginerie Medicală" },
       { interval: "15:30 – 15:45", activity: "Gustare și hidratare" },
       { interval: "15:45 – 17:15", activity: "VOLEI Știința București - joc și mișcare" },
       { interval: "17:15 -17:30", activity: "Pictura, jocuri cu mingea, șotron" },
@@ -47,7 +50,7 @@ export const PROGRAM_DAYS: ProgramDay[] = [
       { interval: "10.30 – 12:00", activity: "Experimente chimice\nFacultatea de Inginerie Chimică și Biotehnologii" },
       { interval: "12:00 – 13:00", activity: "Water Engineering Lab\nFriendship Factory\nPuzzle/Logic Corner" },
       { interval: "13:00 – 14:00", activity: "Prânz" },
-      { interval: "14:00 – 15:30", activity: "Activități coordonate de Facultatea de Energetică" },
+      { interval: "14:00 – 15:30", activity: "Activități coordonate de Facultatea de Inginerie Medicală" },
       { interval: "15:30 – 15:45", activity: "Gustare și hidratare" },
       { interval: "15:45 – 17:15", activity: "VOLEI Știința București - joc și mișcare" },
       { interval: "17:15 -17:30", activity: "Desen liber, coarda" },
@@ -60,7 +63,7 @@ export const PROGRAM_DAYS: ProgramDay[] = [
       { interval: "10.30 – 12:00", activity: "Experimente chimice\nFacultatea de Inginerie Chimică și Biotehnologii" },
       { interval: "12:00 – 13:00", activity: "VIP lounge, write/read corner, robo table games, 'ce ai scris in frunte?', Trivia" },
       { interval: "13:00 – 14:00", activity: "Prânz" },
-      { interval: "14:00 – 15:30", activity: "Activități coordonate de Facultatea de Energetică" },
+      { interval: "14:00 – 15:30", activity: "Activități coordonate de Facultatea de Inginerie Medicală" },
       { interval: "15:30 – 15:45", activity: "Gustare și hidratare" },
       { interval: "15:45 – 17:15", activity: "VOLEI Știința București - joc și mișcare" },
       { interval: "17:15 -17:30", activity: "Scris, citit, joaca in aer liber" },
@@ -77,10 +80,10 @@ export const PROGRAM_DAYS: ProgramDay[] = [
       { interval: "08:30- 9:00", activity: "Sosire copii, warm-up" },
       { interval: "9:00 - 10:30", activity: "Activități de cunoaștere" },
       { interval: "10.15-10.30", activity: "Gustare" },
-      { interval: "10.30 – 12:00", activity: "Activități susținute de Facultatea de Inginerie Industrială și Robotică" },
+      { interval: "10.30 – 12:00", activity: "Activități susținute de echipa 2Space\nHUB ZBOR" },
       { interval: "12:00 – 13:00", activity: "fairy garden" },
       { interval: "13:00 – 14:00", activity: "Prânz" },
-      { interval: "14:00 – 15:30", activity: "Activități susținute de Facultatea\nInginerie Medicală" },
+      { interval: "14:00 – 15:30", activity: "Laborator microscopie\nLaborator sală anecoică\nActivități lounge facultatea de Inginerie Industrială și Robotică" },
       { interval: "15:30 – 15:45", activity: "Gustare și hidratare" },
       { interval: "15:45 – 17:15", activity: "BASCHET Știința București - joc și mișcare" },
       { interval: "17:15 -17:30", activity: "Joacă în echipă, fuga cu sacii" },
@@ -90,10 +93,10 @@ export const PROGRAM_DAYS: ProgramDay[] = [
       { interval: "08:30- 9:00", activity: "Sosire copii, warm-up" },
       { interval: "9:00 - 10:30", activity: "Activități de cunoaștere" },
       { interval: "10.15-10.30", activity: "Gustare" },
-      { interval: "10.30 – 12:00", activity: "Activități susținute de Facultatea de Inginerie Industrială și Robotică" },
+      { interval: "10.30 – 12:00", activity: "Activități susținute de echipa 2Space\nHUB ZBOR" },
       { interval: "12:00 – 13:00", activity: "fairy garden" },
       { interval: "13:00 – 14:00", activity: "Prânz" },
-      { interval: "14:00 – 15:30", activity: "Activități susținute de Facultatea\nInginerie Medicală" },
+      { interval: "14:00 – 15:30", activity: "Laborator microscopie\nLaborator sală anecoică\nActivități lounge facultatea de Inginerie Industrială și Robotică" },
       { interval: "15:30 – 15:45", activity: "Gustare și hidratare" },
       { interval: "15:45 – 17:15", activity: "BASCHET Știința București - joc și mișcare" },
       { interval: "17:15 -17:30", activity: "Joacă în echipă, fuga cu sacii" },
@@ -103,10 +106,10 @@ export const PROGRAM_DAYS: ProgramDay[] = [
       { interval: "08:30- 9:00", activity: "Sosire copii, warm-up" },
       { interval: "9:00 - 10:30", activity: "Activități de cunoaștere" },
       { interval: "10.15-10.30", activity: "Gustare" },
-      { interval: "10.30 – 12:00", activity: "Activități susținute de Facultatea de Inginerie Industrială și Robotică" },
+      { interval: "10.30 – 12:00", activity: "Activități susținute de echipa 2Space\nHUB ZBOR" },
       { interval: "12:00 – 13:00", activity: "fairy garden" },
       { interval: "13:00 – 14:00", activity: "Prânz" },
-      { interval: "14:00 – 15:30", activity: "Activități susținute de Facultatea\nInginerie Medicală" },
+      { interval: "14:00 – 15:30", activity: "Laborator microscopie\nLaborator sală anecoică\nActivități lounge facultatea de Inginerie Industrială și Robotică" },
       { interval: "15:30 – 15:45", activity: "Gustare și hidratare" },
       { interval: "15:45 – 17:15", activity: "BASCHET Știința București - joc și mișcare" },
       { interval: "17:15 -17:30", activity: "Joacă în echipă, fuga cu sacii" },

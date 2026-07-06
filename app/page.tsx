@@ -6,11 +6,14 @@ import { INSCRIPTION_CLOSED_MESSAGE } from "@/lib/inscription-constants";
 import {
   PROGRAM_AGE_GROUPS,
   PROGRAM_DAYS,
+  PROGRAM_DOWNLOAD_FILE,
+  PROGRAM_DOWNLOAD_LABEL,
   type ProgramAgeGroupKey,
 } from "@/lib/program-schedule";
 import {
   Clock3,
   Compass,
+  Download,
   Mail,
   MapPin,
   ShieldCheck,
@@ -182,6 +185,14 @@ export default function Home() {
           <p className="muted programIntro">
             Program săptămânal — alege grupa de vârstă pentru a vedea activitățile zilnice.
           </p>
+          <a
+            href={PROGRAM_DOWNLOAD_FILE}
+            download="program-tabere-saptamana-3.jpeg"
+            className="programDownloadBtn"
+          >
+            <Download size={18} aria-hidden="true" />
+            {PROGRAM_DOWNLOAD_LABEL}
+          </a>
           <div
             className="ageTabs programAgeTabs"
             role="tablist"
