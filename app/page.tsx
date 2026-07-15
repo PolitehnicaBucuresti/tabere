@@ -187,7 +187,7 @@ export default function Home() {
           </p>
           <a
             href={PROGRAM_DOWNLOAD_FILE}
-            download="program-tabere-saptamana-3.jpeg"
+            download="Program-tabere.jpg"
             className="programDownloadBtn"
           >
             <Download size={18} aria-hidden="true" />
